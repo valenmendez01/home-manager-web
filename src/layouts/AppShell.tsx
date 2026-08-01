@@ -13,7 +13,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <div className="flex h-full flex-col bg-neutral-950">
       <main className="flex-1 overflow-y-auto safe-top">{children}</main>
 
-      <nav className="flex border-t border-neutral-800 bg-black safe-bottom">
+      <nav className="flex border-t border-neutral-800 bg-black">
         {TABS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
