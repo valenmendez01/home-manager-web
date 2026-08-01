@@ -7,6 +7,7 @@ declare let self: ServiceWorkerGlobalScope;
 precacheAndRoute(self.__WB_MANIFEST);
 
 self.skipWaiting();
+self.clients.claim();
 
 // --- Web Push: reemplaza al manejador de expo-notifications ---
 self.addEventListener("push", (event) => {

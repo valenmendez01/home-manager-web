@@ -15,10 +15,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* deja lugar para la home indicator / notch en iPhone */
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
 .safe-top {
   padding-top: env(safe-area-inset-top);
 }
