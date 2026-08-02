@@ -48,8 +48,8 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
       scrollBehavior="inside"
       size="full"
       classNames={{
-        wrapper: "items-end",
-        base: "m-0 rounded-t-3xl rounded-b-none bg-neutral-900",
+        wrapper: "items-end !p-0",
+        base: "m-0 rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom",
         body: "px-5 pb-2 pt-1",
         closeButton: "text-neutral-400 hover:bg-neutral-800",
       }}

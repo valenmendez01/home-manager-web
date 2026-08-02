@@ -76,8 +76,8 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
         scrollBehavior="inside"
         size="full"
         classNames={{
-          wrapper: "items-end",
-          base: "m-0 max-h-[85vh] rounded-t-3xl rounded-b-none bg-neutral-900",
+          wrapper: "items-end !p-0",
+          base: "m-0 max-h-[85vh] rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom",
           body: "px-5 pb-6 pt-1",
           closeButton: "text-neutral-400 hover:bg-neutral-800",
         }}
