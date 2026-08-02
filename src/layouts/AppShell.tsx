@@ -24,14 +24,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
         className="h-full overflow-y-auto safe-top"
-        style={{ bottom: "env(safe-area-inset-bottom)" }}
+        style={{ paddingBottom: "calc(56px + env(safe-area-inset-bottom))" }}
       >
         {children}
       </main>
 
       <div
         className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
-        style={{ bottom: "max(12px, env(safe-area-inset-bottom))" }}
+        style={{ bottom: "env(safe-area-inset-bottom)" }}
       >
         <Tabs
           aria-label="Navegación principal"
