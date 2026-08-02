@@ -23,8 +23,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
-        className="h-full overflow-y-auto safe-top"
-        style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
+        className="overflow-y-auto safe-top"
       >
         {children}
       </main>
@@ -41,7 +40,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         radius="none"
         disableCursorAnimation
         classNames={{
-          base: "fixed inset-x-0 bottom-0 z-50 border-t border-neutral-800 bg-black safe-bottom",
+          base: "fixed inset-x-0 bottom-0 z-50 border-t border-neutral-800 bg-black",
           tabList: "gap-0 bg-transparent p-0",
           cursor: "hidden",
           tab: "h-14 rounded-none data-[hover-unselected=true]:opacity-100",
