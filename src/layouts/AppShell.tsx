@@ -1,34 +1,66 @@
-import { NavLink } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Tabs, Tab } from "@heroui/tabs";
 import { Home, Wallet, ShoppingCart } from "lucide-react";
-import { ReactNode } from "react";
+import { Key, ReactNode } from "react";
 
 const TABS = [
-  { to: "/limpieza", label: "Limpieza", icon: Home },
-  { to: "/deudas", label: "Deudas", icon: Wallet },
-  { to: "/compras", label: "Compras", icon: ShoppingCart },
+  { key: "/limpieza", label: "Limpieza", icon: Home },
+  { key: "/deudas", label: "Deudas", icon: Wallet },
+  { key: "/compras", label: "Compras", icon: ShoppingCart },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex h-full flex-col bg-neutral-950">
-      <main className="flex-1 overflow-y-auto safe-top">{children}</main>
+  const navigate = useNavigate();
+  const location = useLocation();
 
-      <nav className="flex border-t border-neutral-800 bg-black">
-        {TABS.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `flex flex-1 flex-col items-center gap-1 py-2.5 text-xs ${
-                isActive ? "text-blue-400" : "text-neutral-500"
-              }`
+  // App.tsx redirige "/" a "/limpieza", así que si no matchea ningún tab
+  // (ej: estamos en "/"), dejamos ese como seleccionado por defecto.
+  const activeKey =
+    TABS.find((tab) => tab.key === location.pathname)?.key ?? "/limpieza";
+
+  return (
+    <div className="h-full bg-neutral-950">
+      {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
+          nunca quede tapado; suma además el home-indicator de iOS */}
+      <main
+        className="h-full overflow-y-auto safe-top"
+        style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
+      >
+        {children}
+      </main>
+
+      {/* fixed + inset-x-0 bottom-0: el navbar queda anclado al borde inferior
+          de la pantalla siempre, sin importar cuánto contenido tenga la página */}
+      <Tabs
+        aria-label="Navegación principal"
+        selectedKey={activeKey}
+        onSelectionChange={(key: Key) => navigate(key as string)}
+        variant="light"
+        color="primary"
+        fullWidth
+        radius="none"
+        disableCursorAnimation
+        classNames={{
+          base: "fixed inset-x-0 bottom-0 z-50 border-t border-neutral-800 bg-black safe-bottom",
+          tabList: "gap-0 bg-transparent p-0",
+          cursor: "hidden",
+          tab: "h-14 rounded-none data-[hover-unselected=true]:opacity-100",
+          tabContent:
+            "flex flex-col items-center gap-1 text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
+        }}
+      >
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <Tab
+            key={key}
+            title={
+              <>
+                <Icon size={22} strokeWidth={2} />
+                {label}
+              </>
             }
-          >
-            <Icon size={22} strokeWidth={2} />
-            {label}
-          </NavLink>
+          />
         ))}
-      </nav>
+      </Tabs>
     </div>
   );
 }

@@ -1,5 +1,9 @@
 import { Drawer } from "vaul";
 import { Trash2 } from "lucide-react";
+import { Button } from "@heroui/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
+import { addToast } from "@heroui/toast";
+import { useState } from "react";
 import { AmbienteConEstado, Limpieza } from "@/types/limpieza";
 import { useMarcarLimpio } from "@/hooks/useMarcarLimpio";
 import { useHistorialAmbiente } from "@/hooks/useHistorialAmbiente";
@@ -21,86 +25,174 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
   const userId = useAuthStore((s) => s.user?.id);
   const eliminarLimpieza = useEliminarLimpieza();
 
+  // modal de confirmación antes de borrar un registro del historial
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [aBorrar, setABorrar] = useState<Limpieza | null>(null);
+
+  const handleMarcarLimpio = () => {
+    if (!ambiente) return;
+    marcarLimpio.mutate(ambiente.id, {
+      onSuccess: () => {
+        addToast({
+          title: "¡Listo!",
+          description: `${ambiente.nombre} quedó marcado como limpio.`,
+          color: "success",
+        });
+      },
+      onError: () => {
+        addToast({
+          title: "No se pudo guardar",
+          description: "Intentá de nuevo en unos segundos.",
+          color: "danger",
+        });
+      },
+    });
+  };
+
+  const pedirConfirmacionBorrado = (item: Limpieza) => {
+    setABorrar(item);
+    onOpen();
+  };
+
+  const confirmarBorrado = () => {
+    if (!aBorrar) return;
+    eliminarLimpieza.mutate(aBorrar.id, {
+      onSuccess: () => {
+        addToast({ title: "Registro eliminado", color: "success" });
+      },
+      onError: () => {
+        addToast({
+          title: "No se pudo eliminar",
+          description: "Intentá de nuevo en unos segundos.",
+          color: "danger",
+        });
+      },
+    });
+    setABorrar(null);
+  };
+
   return (
-    <Drawer.Root
-      open={!!ambiente}
-      onOpenChange={(open) => !open && onClose()}
-      snapPoints={[0.5, 0.85]}
-    >
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85vh] flex-col rounded-t-3xl bg-neutral-900">
-          <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600" />
+    <>
+      <Drawer.Root
+        open={!!ambiente}
+        onOpenChange={(open) => !open && onClose()}
+        snapPoints={[0.5, 0.85]}
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
+          <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85vh] flex-col rounded-t-3xl bg-neutral-900">
+            <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600" />
 
-          {ambiente && (
-            <div className="overflow-y-auto px-5 pb-6 pt-4 safe-bottom">
-              <Drawer.Title className="text-xl font-semibold text-neutral-50">
-                {ambiente.nombre}
-              </Drawer.Title>
-              <p className="mt-1 text-sm text-neutral-400">
-                {ambiente.diasTranscurridos === null
-                  ? "Nunca se registró una limpieza"
-                  : `Última limpieza hecha por ${nombreUsuario(
-                      ambiente.ultimaLimpieza!.usuario_id
-                    )} hace ${ambiente.diasTranscurridos} día(s)`}
-              </p>
+            {ambiente && (
+              <div className="overflow-y-auto px-5 pb-6 pt-4 safe-bottom">
+                <Drawer.Title className="text-xl font-semibold text-neutral-50">
+                  {ambiente.nombre}
+                </Drawer.Title>
+                <p className="mt-1 text-sm text-neutral-400">
+                  {ambiente.diasTranscurridos === null
+                    ? "Nunca se registró una limpieza"
+                    : `Última limpieza hecha por ${nombreUsuario(
+                        ambiente.ultimaLimpieza!.usuario_id
+                      )} hace ${ambiente.diasTranscurridos} día(s)`}
+                </p>
 
-              <button
-                onClick={() => marcarLimpio.mutate(ambiente.id)}
-                disabled={marcarLimpio.isPending}
-                className="mt-4 w-full rounded-2xl bg-blue-500 py-3 text-center font-medium text-white active:bg-blue-600 disabled:opacity-50"
-              >
-                {marcarLimpio.isPending ? "Guardando..." : "Marcar como limpio"}
-              </button>
+                <Button
+                  className="mt-4"
+                  color="primary"
+                  fullWidth
+                  radius="lg"
+                  size="lg"
+                  isLoading={marcarLimpio.isPending}
+                  onPress={handleMarcarLimpio}
+                >
+                  {marcarLimpio.isPending ? "Guardando..." : "Marcar como limpio"}
+                </Button>
 
-              <p className="mb-2 mt-6 text-sm font-medium text-neutral-300">Historial</p>
-              {isLoading && <p className="text-sm text-neutral-300">Cargando...</p>}
-              {!isLoading && (historial ?? []).length === 0 && (
-                <p className="text-sm text-neutral-300">Sin registros todavía</p>
-              )}
+                <p className="mb-2 mt-6 text-sm font-medium text-neutral-300">Historial</p>
+                {isLoading && <p className="text-sm text-neutral-300">Cargando...</p>}
+                {!isLoading && (historial ?? []).length === 0 && (
+                  <p className="text-sm text-neutral-300">Sin registros todavía</p>
+                )}
 
-              {(historial ?? []).map((item: Limpieza, index: number) => {
-                const esElMasReciente = index === 0;
-                const esMio = item.usuario_id === userId;
-                const puedeBorrar = esElMasReciente && esMio;
+                {(historial ?? []).map((item: Limpieza, index: number) => {
+                  const esElMasReciente = index === 0;
+                  const esMio = item.usuario_id === userId;
+                  const puedeBorrar = esElMasReciente && esMio;
+                  const borrandoEste =
+                    eliminarLimpieza.isPending && eliminarLimpieza.variables === item.id;
 
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between border-b border-neutral-800 py-2"
-                  >
-                    <div className="flex flex-1 items-center">
-                      <span className="text-sm font-medium text-neutral-50">
-                        {nombreUsuario(item.usuario_id)}
-                      </span>
-                      <span className="text-sm text-neutral-500">
-                        {" · "}
-                        {new Date(item.realizado_at).toLocaleDateString()}
-                        {" · "}
-                        {new Date(item.realizado_at).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border-b border-neutral-800 py-2"
+                    >
+                      <div className="flex flex-1 items-center">
+                        <span className="text-sm font-medium text-neutral-50">
+                          {nombreUsuario(item.usuario_id)}
+                        </span>
+                        <span className="text-sm text-neutral-500">
+                          {" · "}
+                          {new Date(item.realizado_at).toLocaleDateString()}
+                          {" · "}
+                          {new Date(item.realizado_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+
+                      {puedeBorrar && (
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="light"
+                          className="pl-3"
+                          isLoading={borrandoEste}
+                          onPress={() => pedirConfirmacionBorrado(item)}
+                          aria-label="Eliminar registro"
+                        >
+                          {!borrandoEste && <Trash2 size={18} color="#737373" />}
+                        </Button>
+                      )}
                     </div>
+                  );
+                })}
+              </div>
+            )}
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
 
-                    {puedeBorrar && (
-                      <button
-                        onClick={() => eliminarLimpieza.mutate(item.id)}
-                        disabled={eliminarLimpieza.isPending}
-                        className="pl-3"
-                        aria-label="Eliminar registro"
-                      >
-                        <Trash2 size={18} color="#737373" />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+      {/* Confirmación antes de borrar un registro del historial */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+        <ModalContent>
+          {(closeModal) => (
+            <>
+              <ModalHeader>Eliminar registro</ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-neutral-400">
+                  ¿Seguro que querés eliminar este registro de limpieza? Esta acción no se puede
+                  deshacer.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={closeModal}>
+                  Cancelar
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    confirmarBorrado();
+                    closeModal();
+                  }}
+                >
+                  Eliminar
+                </Button>
+              </ModalFooter>
+            </>
           )}
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

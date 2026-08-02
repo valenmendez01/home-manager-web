@@ -6,6 +6,10 @@ html,
 body,
 #root {
   height: 100%;
+  /* dvh = alto real visible del navegador móvil (descuenta la barra de
+    direcciones), evita que el navbar "fixed" quede mal calculado o se
+    desplace cuando el contenido de la página es más alto que la pantalla */
+  height: 100dvh;
 }
 
 body {
@@ -17,4 +21,8 @@ body {
 
 .safe-top {
   padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }

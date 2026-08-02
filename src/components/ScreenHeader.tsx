@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 import { LogOut } from "lucide-react";
+import { Button } from "@heroui/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { useAuthStore } from "@/store/authStore";
 
 interface Props {
@@ -10,12 +12,7 @@ interface Props {
 
 export default function ScreenHeader({ title, subtitle, rightElement }: Props) {
   const signOut = useAuthStore((s) => s.signOut);
-
-  const confirmarLogout = () => {
-    if (window.confirm("¿Seguro que querés salir?")) {
-      signOut();
-    }
-  };
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
     <div className="flex items-center justify-between px-5 pb-3 pt-2">
@@ -26,14 +23,44 @@ export default function ScreenHeader({ title, subtitle, rightElement }: Props) {
 
       <div className="flex items-center gap-2">
         {rightElement}
-        <button
-          onClick={confirmarLogout}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 active:bg-neutral-800"
+        <Button
+          isIconOnly
+          radius="full"
+          variant="flat"
+          className="h-9 w-9 bg-neutral-900"
+          onPress={onOpen}
           aria-label="Cerrar sesión"
         >
           <LogOut size={18} color="#A3A3A3" />
-        </button>
+        </Button>
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+        <ModalContent>
+          {(closeModal) => (
+            <>
+              <ModalHeader>Cerrar sesión</ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-neutral-400">¿Seguro que querés salir?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={closeModal}>
+                  Cancelar
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    signOut();
+                    closeModal();
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
