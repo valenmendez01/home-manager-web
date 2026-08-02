@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@heroui/button": "2.2.21",
+    "@heroui/chip": "^2.2.13",
+    "@heroui/input": "^2.4.17",
     "@heroui/modal": "2.2.18",
+    "@heroui/spinner": "^2.2.16",
     "@heroui/system": "2.4.17",
     "@heroui/tabs": "2.2.18",
     "@heroui/theme": "2.4.17",
@@ -23,7 +26,6 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.1.1",
-    "vaul": "^1.1.2",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

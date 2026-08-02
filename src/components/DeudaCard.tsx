@@ -2,6 +2,8 @@ import { Deuda } from "@/types/deudas";
 import { nombreUsuario } from "@/constants/usuarios";
 import { useAuthStore } from "@/store/authStore";
 import { usePagarDeuda } from "@/hooks/usePagarDeuda";
+import { Chip } from "@heroui/chip";
+import { Button } from "@heroui/button";
 
 interface Props {
   deuda: Deuda;
@@ -31,22 +33,24 @@ export default function DeudaCard({ deuda }: Props) {
       </div>
 
       <div className="mt-3 flex items-center justify-between">
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            deuda.estado === "pagada" ? "bg-green-950 text-green-400" : "bg-yellow-950 text-yellow-400"
-          }`}
+        <Chip 
+          color={deuda.estado === "pagada" ? "success" : "warning"} 
+          variant="flat" 
+          size="sm"
         >
-          {deuda.estado === "pagada" ? "Pagada" : "Pendiente"}
-        </span>
+            {deuda.estado === "pagada" ? "Pagada" : "Pendiente"}
+        </Chip>
 
         {puedeMarcarPagada && (
-          <button
-            onClick={() => pagarDeuda.mutate(deuda.id)}
-            disabled={pagarDeuda.isPending}
-            className="rounded-xl bg-blue-500 px-4 py-2 text-sm font-medium text-white active:bg-blue-600 disabled:opacity-50"
+          <Button 
+            color="primary" 
+            size="sm" 
+            radius="lg" 
+            isLoading={pagarDeuda.isPending} 
+            onPress={() => pagarDeuda.mutate(deuda.id)}
           >
-            {pagarDeuda.isPending ? "..." : "Pagar"}
-          </button>
+            Pagar
+          </Button>
         )}
       </div>
     </div>

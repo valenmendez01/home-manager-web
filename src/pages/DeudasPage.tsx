@@ -8,6 +8,8 @@ import NuevaDeudaModal from "@/components/NuevaDeudaModal";
 import { Deuda } from "@/types/deudas";
 import ScreenHeader from "@/components/ScreenHeader";
 import HistorialPagos from "@/components/HistorialPagos";
+import { Spinner } from "@heroui/spinner";
+import { Button } from "@heroui/button";
 
 export default function DeudasPage() {
   const { data: deudas, isLoading } = useDeudas();
@@ -17,7 +19,7 @@ export default function DeudasPage() {
   if (isLoading || !deudas) {
     return (
       <div className="flex h-full items-center justify-center bg-neutral-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-700 border-t-blue-500" />
+        <Spinner color="primary" size="lg" />
       </div>
     );
   }
@@ -27,13 +29,9 @@ export default function DeudasPage() {
       <ScreenHeader
         title="Deudas"
         rightElement={
-          <button
-            onClick={() => setModalVisible(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500 active:bg-blue-600"
-            aria-label="Nueva deuda"
-          >
-            <Plus size={20} color="white" />
-          </button>
+          <Button isIconOnly color="primary" radius="full" size="sm" aria-label="Nueva deuda" onPress={() => setModalVisible(true)}>
+            <Plus size={20} />
+          </Button>
         }
       />
 

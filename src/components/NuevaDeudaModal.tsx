@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Drawer } from "vaul";
+import { Button } from "@heroui/button";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { useAuthStore } from "@/store/authStore";
 import { useCrearDeuda } from "@/hooks/useCrearDeuda";
 import { otroUsuarioId, nombreUsuario } from "@/constants/usuarios";
+import { Input } from "@heroui/input";
 
 interface Props {
   visible: boolean;
@@ -39,52 +41,67 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Drawer.Root open={visible} onOpenChange={(open) => !open && onClose()}>
-      <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 rounded-t-3xl bg-neutral-900 p-5 safe-bottom">
-          <Drawer.Title className="mb-2 text-xl font-semibold text-neutral-50">
-            Nueva deuda
-          </Drawer.Title>
+    <Modal
+      isOpen={visible}
+      onOpenChange={(open) => !open && onClose()}
+      placement="bottom"
+      scrollBehavior="inside"
+      size="full"
+      classNames={{
+        wrapper: "items-end",
+        base: "m-0 rounded-t-3xl rounded-b-none bg-neutral-900",
+        body: "px-5 pb-2 pt-1",
+        closeButton: "text-neutral-400 hover:bg-neutral-800",
+      }}
+    >
+      <ModalContent>
+        <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600" />
 
-          <input
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-base text-neutral-50 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Descripción"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-          />
+        <ModalHeader className="pb-0 pt-4">
+          <span className="text-xl font-semibold text-neutral-50">Nueva deuda</span>
+        </ModalHeader>
 
-          <input
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-base text-neutral-50 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Monto total"
-            inputMode="decimal"
-            value={monto}
-            onChange={(e) => setMonto(e.target.value)}
-          />
+        <ModalBody>
+          <div className="mt-2 flex flex-col gap-3">
+            <Input
+              variant="bordered"
+              placeholder="Descripción"
+              value={descripcion}
+              onValueChange={setDescripcion}
+            />
 
-          {userId && (
-            <p className="text-xs text-neutral-500">
-              Se dividirá entre vos y {nombreUsuario(otroUsuarioId(userId))}
-            </p>
-          )}
+            <Input
+              variant="bordered"
+              placeholder="Monto total"
+              inputMode="decimal"
+              value={monto}
+              onValueChange={setMonto}
+            />
 
-          <div className="mt-2 flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 rounded-2xl bg-neutral-800 py-3 text-center font-medium text-neutral-300 active:bg-neutral-700"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleGuardar}
-              disabled={crearDeuda.isPending}
-              className="flex-1 rounded-2xl bg-blue-500 py-3 text-center font-medium text-white active:bg-blue-600 disabled:opacity-50"
-            >
-              {crearDeuda.isPending ? "Guardando..." : "Guardar"}
-            </button>
+            {userId && (
+              <p className="text-xs text-neutral-500">
+                Se dividirá entre vos y {nombreUsuario(otroUsuarioId(userId))}
+              </p>
+            )}
           </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+        </ModalBody>
+
+        <ModalFooter className="pt-2">
+          <Button variant="flat" fullWidth radius="lg" size="lg" onPress={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            color="primary"
+            fullWidth
+            radius="lg"
+            size="lg"
+            isLoading={crearDeuda.isPending}
+            onPress={handleGuardar}
+          >
+            {crearDeuda.isPending ? "Guardando..." : "Guardar"}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }

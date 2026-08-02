@@ -6,6 +6,7 @@ import AmbienteDetailSheet from "@/components/AmbienteDetailSheet";
 import { AmbienteConEstado } from "@/types/limpieza";
 import { useRealtimeLimpieza } from "@/hooks/useRealtimeLimpieza";
 import ScreenHeader from "@/components/ScreenHeader";
+import { Spinner } from "@heroui/spinner";
 
 export default function LimpiezaPage() {
   const { data: ambientes, isLoading } = useAmbientesConEstado();
@@ -15,7 +16,7 @@ export default function LimpiezaPage() {
   if (isLoading || !ambientes) {
     return (
       <div className="flex h-full items-center justify-center bg-neutral-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-700 border-t-blue-500" />
+        <Spinner color="primary" size="lg" />
       </div>
     );
   }

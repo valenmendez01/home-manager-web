@@ -1,4 +1,3 @@
-import { Drawer } from "vaul";
 import { Trash2 } from "lucide-react";
 import { Button } from "@heroui/button";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
@@ -16,8 +15,6 @@ interface Props {
   onClose: () => void;
 }
 
-// Equivalente web de @gorhom/bottom-sheet: vaul da el mismo comportamiento
-// (arrastrar para cerrar, snap points) usando gestos táctiles del navegador.
 export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
   const marcarLimpio = useMarcarLimpio();
   const { data: historial, isLoading } = useHistorialAmbiente(ambiente?.id);
@@ -25,7 +22,6 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
   const userId = useAuthStore((s) => s.user?.id);
   const eliminarLimpieza = useEliminarLimpieza();
 
-  // modal de confirmación antes de borrar un registro del historial
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [aBorrar, setABorrar] = useState<Limpieza | null>(null);
 
@@ -73,29 +69,36 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
 
   return (
     <>
-      <Drawer.Root
-        open={!!ambiente}
+      <Modal
+        isOpen={!!ambiente}
         onOpenChange={(open) => !open && onClose()}
-        snapPoints={[0.5, 0.85]}
+        placement="bottom"
+        scrollBehavior="inside"
+        size="full"
+        classNames={{
+          wrapper: "items-end",
+          base: "m-0 max-h-[85vh] rounded-t-3xl rounded-b-none bg-neutral-900",
+          body: "px-5 pb-6 pt-1",
+          closeButton: "text-neutral-400 hover:bg-neutral-800",
+        }}
       >
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
-          <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85vh] flex-col rounded-t-3xl bg-neutral-900">
-            <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600" />
+        <ModalContent>
+          {ambiente && (
+            <>
+              <div className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600" />
 
-            {ambiente && (
-              <div className="overflow-y-auto px-5 pb-6 pt-4 safe-bottom">
-                <Drawer.Title className="text-xl font-semibold text-neutral-50">
-                  {ambiente.nombre}
-                </Drawer.Title>
-                <p className="mt-1 text-sm text-neutral-400">
+              <ModalHeader className="flex flex-col items-start gap-1 pb-0 pt-4">
+                <span className="text-xl font-semibold text-neutral-50">{ambiente.nombre}</span>
+                <p className="text-sm font-normal text-neutral-400">
                   {ambiente.diasTranscurridos === null
                     ? "Nunca se registró una limpieza"
                     : `Última limpieza hecha por ${nombreUsuario(
                         ambiente.ultimaLimpieza!.usuario_id
                       )} hace ${ambiente.diasTranscurridos} día(s)`}
                 </p>
+              </ModalHeader>
 
+              <ModalBody>
                 <Button
                   className="mt-4"
                   color="primary"
@@ -157,13 +160,12 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
                     </div>
                   );
                 })}
-              </div>
-            )}
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
-      {/* Confirmación antes de borrar un registro del historial */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
         <ModalContent>
           {(closeModal) => (

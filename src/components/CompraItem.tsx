@@ -3,6 +3,8 @@ import { CheckSquare, Square, Trash2 } from "lucide-react";
 import { Compra } from "@/types/compras";
 import { useToggleCompra, useEliminarCompra, useEditarCompra } from "@/hooks/useComprasMutations";
 import { nombreUsuario } from "@/constants/usuarios";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 
 interface Props {
   compra: Compra;
@@ -68,8 +70,10 @@ export default function CompraItem({ compra }: Props) {
       }}
       className="mb-2 flex items-center rounded-2xl bg-neutral-900 px-4 py-3"
     >
-      <button
-        onClick={() =>
+      <Button
+        isIconOnly
+        variant="light"
+        onPress={() =>
           toggle.mutate({ id: compra.id, estado: comprado ? "pendiente" : "comprado" })
         }
         className="mr-3 shrink-0"
@@ -80,17 +84,19 @@ export default function CompraItem({ compra }: Props) {
         ) : (
           <Square size={24} color="#737373" />
         )}
-      </button>
+      </Button>
 
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         className="min-w-0 flex-1 text-left"
         onDoubleClick={() => setEditando(true)}
       >
         {editando ? (
-          <input
-            className="w-full border-b border-neutral-700 bg-transparent pb-1 text-base text-neutral-50 focus:outline-none"
+          <Input
+            variant="underlined"
             value={texto}
-            onChange={(e) => setTexto(e.target.value)}
+            onValueChange={setTexto}
             onKeyDown={handleKeyDown}
             onBlur={guardarEdicion}
             autoFocus
@@ -105,11 +111,11 @@ export default function CompraItem({ compra }: Props) {
             </p>
           </div>
         )}
-      </button>
+      </div>
 
-      <button onClick={() => eliminar.mutate(compra.id)} className="pl-3 shrink-0" aria-label="Eliminar">
+      <Button isIconOnly variant="light" onPress={() => eliminar.mutate(compra.id)} className="pl-3 shrink-0" aria-label="Eliminar">
         <Trash2 size={20} color="#737373" />
-      </button>
+      </Button>
     </div>
   );
 }

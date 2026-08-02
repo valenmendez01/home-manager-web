@@ -4,6 +4,7 @@ import CompraItem from "@/components/CompraItem";
 import AgregarCompraInput from "@/components/AgregarCompraInput";
 import { Compra } from "@/types/compras";
 import ScreenHeader from "@/components/ScreenHeader";
+import { Spinner } from "@heroui/spinner";
 
 export default function ComprasPage() {
   const { data: compras, isLoading } = useCompras();
@@ -12,7 +13,7 @@ export default function ComprasPage() {
   if (isLoading || !compras) {
     return (
       <div className="flex h-full items-center justify-center bg-neutral-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-700 border-t-blue-500" />
+        <Spinner color="primary" size="lg" />
       </div>
     );
   }
