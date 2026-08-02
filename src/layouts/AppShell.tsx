@@ -19,11 +19,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
     TABS.find((tab) => tab.key === location.pathname)?.key ?? "/limpieza";
 
   return (
-    <div className="bg-neutral-950">
+    <div className="h-full bg-neutral-950">
       {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
-        className="overflow-y-auto safe-top"
+        className="h-full overflow-y-auto safe-top"
+        style={{ paddingBottom: "calc(56px + 24px + env(safe-area-inset-bottom))" }}
       >
         {children}
       </main>
@@ -40,7 +41,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         radius="none"
         disableCursorAnimation
         classNames={{
-          base: "fixed inset-x-0 bottom-0 z-50 border-t border-neutral-800 bg-black",
+          base: "fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)_+_12px)] z-50 rounded-2xl border border-neutral-800 bg-black/95 backdrop-blur-md shadow-lg shadow-black/40 overflow-hidden",
           tabList: "gap-0 bg-transparent p-0",
           cursor: "hidden",
           tab: "h-14 rounded-none data-[hover-unselected=true]:opacity-100",
