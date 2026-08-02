@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@heroui/button";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { useAuthStore } from "@/store/authStore";
@@ -18,6 +18,12 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
   const userId = useAuthStore((s) => s.user?.id);
   const crearDeuda = useCrearDeuda();
   const dragControls = useDragControls();
+  const [expanded, setExpanded] = useState(false);
+
+  // vuelve a colapsado la próxima vez que se abra
+  useEffect(() => {
+    if (!visible) setExpanded(false);
+  }, [visible]);
 
   const handleGuardar = async () => {
     if (!userId || !descripcion.trim() || !monto) return;
@@ -50,7 +56,9 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
       scrollBehavior="inside"
       classNames={{
         wrapper: "items-end !p-0",
-        base: "m-0 w-full max-w-full rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom",
+        base: `m-0 w-full max-w-full ${
+          expanded ? "h-[100dvh] max-h-[100dvh] safe-top" : ""
+        } rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom transition-[height] duration-300`,
         body: "px-5 pb-2 pt-1",
         closeButton: "text-neutral-400 hover:bg-neutral-800",
       }}
@@ -62,17 +70,28 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
           dragListener={false}
           dragConstraints={{ top: 0, bottom: 400 }}
           dragElastic={{ top: 0, bottom: 0.5 }}
+          dragSnapToOrigin
           onDragEnd={(_, info) => {
-            if (info.offset.y > 100 || info.velocity.y > 500) onClose();
+            if (info.offset.y > 100 || info.velocity.y > 500) {
+              onClose();
+            } else if (info.offset.y < -60 || info.velocity.y < -500) {
+              setExpanded(true);
+            }
           }}
         >
           <div
             onPointerDown={(e) => dragControls.start(e)}
             style={{ touchAction: "none" }}
-            className="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-neutral-600"
-          />
+            className="cursor-grab pb-2 pt-3 active:cursor-grabbing"
+          >
+            <div className="mx-auto h-1.5 w-10 rounded-full bg-neutral-600" />
+          </div>
 
-          <ModalHeader className="pb-0 pt-4">
+          <ModalHeader
+            onPointerDown={(e) => dragControls.start(e)}
+            style={{ touchAction: "none" }}
+            className="cursor-grab pb-0 pt-0 active:cursor-grabbing"
+          >
             <span className="text-xl font-semibold text-neutral-50">Nueva deuda</span>
           </ModalHeader>
 
