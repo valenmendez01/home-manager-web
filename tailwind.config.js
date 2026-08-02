@@ -12,6 +12,8 @@ export default {
     "./node_modules/@heroui/theme/dist/components/modal.js",
     "./node_modules/@heroui/theme/dist/components/toast.js",
     "./node_modules/@heroui/theme/dist/components/spinner.js",
+    "./node_modules/@heroui/theme/dist/components/input.js",
+    "./node_modules/@heroui/theme/dist/components/chip.js",
   ],
   darkMode: "class",
   theme: {
