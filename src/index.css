@@ -6,21 +6,6 @@ html,
 body,
 #root {
   height: 100%;
-  /* dvh = alto real visible del navegador móvil (descuenta la barra de
-    direcciones), evita que el navbar "fixed" quede mal calculado o se
-    desplace cuando el contenido de la página es más alto que la pantalla */
-  height: 100dvh;
-}
-
-/* en PWA instalada (standalone) no hay barra de navegador que colapse,
-  así que dvh no debería usarse acá: iOS la calcula mal en el arranque en frío
-  y deja un hueco vacío hasta el primer scroll. svh es estable desde el inicio. */
-@media (display-mode: standalone) {
-  html,
-  body,
-  #root {
-    height: 100svh;
-  }
 }
 
 body {
