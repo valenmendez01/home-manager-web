@@ -14,6 +14,7 @@ export default {
     "./node_modules/@heroui/theme/dist/components/spinner.js",
     "./node_modules/@heroui/theme/dist/components/input.js",
     "./node_modules/@heroui/theme/dist/components/chip.js",
+    "./node_modules/@heroui/theme/dist/components/skeleton.js",
   ],
   darkMode: "class",
   theme: {

@@ -4,7 +4,7 @@ import CompraItem from "@/components/CompraItem";
 import AgregarCompraInput from "@/components/AgregarCompraInput";
 import { Compra } from "@/types/compras";
 import ScreenHeader from "@/components/ScreenHeader";
-import { Spinner } from "@heroui/spinner";
+import { Skeleton } from "@heroui/skeleton";
 
 export default function ComprasPage() {
   const { data: compras, isLoading } = useCompras();
@@ -12,8 +12,11 @@ export default function ComprasPage() {
 
   if (isLoading || !compras) {
     return (
-      <div className="flex h-full items-center justify-center bg-neutral-950">
-        <Spinner color="primary" size="lg" />
+      <div className="flex flex-col gap-2 bg-neutral-950 p-5">
+        <Skeleton className="h-8 w-40 rounded-lg" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-14 w-full rounded-2xl" />
+        ))}
       </div>
     );
   }

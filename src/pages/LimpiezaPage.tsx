@@ -6,7 +6,7 @@ import AmbienteDetailSheet from "@/components/AmbienteDetailSheet";
 import { AmbienteConEstado } from "@/types/limpieza";
 import { useRealtimeLimpieza } from "@/hooks/useRealtimeLimpieza";
 import ScreenHeader from "@/components/ScreenHeader";
-import { Spinner } from "@heroui/spinner";
+import { Skeleton } from "@heroui/skeleton";
 
 export default function LimpiezaPage() {
   const { data: ambientes, isLoading } = useAmbientesConEstado();
@@ -15,8 +15,14 @@ export default function LimpiezaPage() {
 
   if (isLoading || !ambientes) {
     return (
-      <div className="flex h-full items-center justify-center bg-neutral-950">
-        <Spinner color="primary" size="lg" />
+      <div className="flex min-h-full flex-col gap-4 bg-neutral-950 p-5">
+        <Skeleton className="h-8 w-40 rounded-lg" />
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="grid grid-cols-2 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }

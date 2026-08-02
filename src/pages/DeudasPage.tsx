@@ -8,7 +8,7 @@ import NuevaDeudaModal from "@/components/NuevaDeudaModal";
 import { Deuda } from "@/types/deudas";
 import ScreenHeader from "@/components/ScreenHeader";
 import HistorialPagos from "@/components/HistorialPagos";
-import { Spinner } from "@heroui/spinner";
+import { Skeleton } from "@heroui/skeleton";
 import { Button } from "@heroui/button";
 
 export default function DeudasPage() {
@@ -18,8 +18,11 @@ export default function DeudasPage() {
 
   if (isLoading || !deudas) {
     return (
-      <div className="flex h-full items-center justify-center bg-neutral-950">
-        <Spinner color="primary" size="lg" />
+      <div className="flex flex-col gap-3 bg-neutral-950 p-5">
+        <Skeleton className="h-24 w-full rounded-2xl" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+        ))}
       </div>
     );
   }
