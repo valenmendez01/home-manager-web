@@ -19,7 +19,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     TABS.find((tab) => tab.key === location.pathname)?.key ?? "/limpieza";
 
   return (
-    <div className="h-full bg-neutral-950">
+    <div className="bg-neutral-950">
       {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
