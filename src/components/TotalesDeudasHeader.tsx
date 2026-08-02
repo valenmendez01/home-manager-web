@@ -1,4 +1,6 @@
 import { Deuda } from "@/types/deudas";
+import { useAuthStore } from "@/store/authStore";
+import { nombreUsuario, otroUsuarioId } from "@/constants/usuarios";
 
 interface Props {
   deudas: Deuda[];
@@ -9,23 +11,39 @@ function formatMonto(monto: number) {
 }
 
 export default function TotalesDeudasHeader({ deudas }: Props) {
-  const pendiente = deudas
-    .filter((d) => d.estado === "pendiente")
+  const userId = useAuthStore((s) => s.user?.id);
+  const otroId = userId ? otroUsuarioId(userId) : undefined;
+
+  const pendientes = deudas.filter((d) => d.estado === "pendiente");
+
+  // cuánto le deben al usuario logeado (deudas donde él puso la plata)
+  const meDeben = pendientes
+    .filter((d) => d.pagado_por === userId)
     .reduce((acc, d) => acc + Number(d.monto_debe), 0);
 
-  const pagado = deudas
-    .filter((d) => d.estado === "pagada")
+  // cuánto debe el usuario logeado (deudas donde el otro puso la plata)
+  const yoDebo = pendientes
+    .filter((d) => d.pagado_por === otroId)
     .reduce((acc, d) => acc + Number(d.monto_debe), 0);
+
+  // neteo: si soy acreedor neto, no debo nada y el otro me debe la diferencia (y viceversa)
+  const balance = meDeben - yoDebo;
+  const miDeuda = balance < 0 ? Math.abs(balance) : 0;
+  const suDeuda = balance > 0 ? balance : 0;
 
   return (
     <div className="flex gap-3 px-5 pb-4 pt-2">
       <div className="flex-1 rounded-2xl bg-neutral-900 p-4">
-        <p className="text-xs text-neutral-500">Pendiente</p>
-        <p className="mt-1 text-xl font-semibold text-red-400">{formatMonto(pendiente)}</p>
+        <p className="text-xs text-neutral-500">
+          {userId ? nombreUsuario(userId) : "Vos"} debe
+        </p>
+        <p className="mt-1 text-xl font-semibold text-red-400">{formatMonto(miDeuda)}</p>
       </div>
       <div className="flex-1 rounded-2xl bg-neutral-900 p-4">
-        <p className="text-xs text-neutral-500">Pagado</p>
-        <p className="mt-1 text-xl font-semibold text-green-400">{formatMonto(pagado)}</p>
+        <p className="text-xs text-neutral-500">
+          {otroId ? nombreUsuario(otroId) : "El otro"} te debe
+        </p>
+        <p className="mt-1 text-xl font-semibold text-green-400">{formatMonto(suDeuda)}</p>
       </div>
     </div>
   );
