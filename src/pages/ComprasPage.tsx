@@ -18,11 +18,9 @@ export default function ComprasPage() {
     );
   }
 
-  const pendientes = compras.filter((c) => c.estado === "pendiente").length;
-
   return (
     <div className="bg-neutral-950">
-      <ScreenHeader title="Compras" subtitle={`${pendientes} pendiente${pendientes !== 1 ? "s" : ""}`} />
+      <ScreenHeader title="Compras" />
 
       <AgregarCompraInput />
 
