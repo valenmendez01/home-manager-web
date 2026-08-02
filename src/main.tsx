@@ -8,7 +8,7 @@ import App from "./App";
 
 // Registra el service worker (cache offline + listener de Web Push).
 // skipWaiting/clientsClaim ya están seteados dentro de src/sw.ts.
-registerSW({ immediate: true });
+registerSW({ immediate: true, onRegisterError: (error) => console.error("SW error:", error) });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

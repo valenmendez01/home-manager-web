@@ -12,6 +12,17 @@ body,
   height: 100dvh;
 }
 
+/* en PWA instalada (standalone) no hay barra de navegador que colapse,
+  así que dvh no debería usarse acá: iOS la calcula mal en el arranque en frío
+  y deja un hueco vacío hasta el primer scroll. svh es estable desde el inicio. */
+@media (display-mode: standalone) {
+  html,
+  body,
+  #root {
+    height: 100svh;
+  }
+}
+
 body {
   @apply bg-neutral-950 text-neutral-50;
   /* evita el "pull to refresh" / bounce del navegador para que se sienta como app */
