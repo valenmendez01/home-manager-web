@@ -24,43 +24,38 @@ export default function AppShell({ children }: { children: ReactNode }) {
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
         className="h-full overflow-y-auto safe-top"
-        style={{ paddingBottom: "calc(56px + 24px + env(safe-area-inset-bottom))" }}
+        style={{ paddingBottom: "calc(56px + 12px + env(safe-area-inset-bottom))" }}
       >
         {children}
       </main>
 
-      {/* fixed + inset-x-0 bottom-0: el navbar queda anclado al borde inferior
-          de la pantalla siempre, sin importar cuánto contenido tenga la página */}
-      <Tabs
-        aria-label="Navegación principal"
-        selectedKey={activeKey}
-        onSelectionChange={(key: Key) => navigate(key as string)}
-        variant="light"
-        color="primary"
-        fullWidth
-        radius="none"
-        disableCursorAnimation
-        classNames={{
-          base: "fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)_+_12px)] z-50 rounded-2xl border border-neutral-800 bg-black/95 backdrop-blur-md shadow-lg shadow-black/40 overflow-hidden",
-          tabList: "gap-0 bg-transparent p-0",
-          cursor: "hidden",
-          tab: "h-14 rounded-none data-[hover-unselected=true]:opacity-100",
-          tabContent:
-            "flex flex-col items-center gap-1 text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
-        }}
+      <div
+        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
+        style={{ bottom: "max(12px, env(safe-area-inset-bottom))" }}
       >
-        {TABS.map(({ key, label, icon: Icon }) => (
-          <Tab
-            key={key}
-            title={
-              <>
-                <Icon size={22} strokeWidth={2} />
-                {label}
-              </>
-            }
-          />
-        ))}
-      </Tabs>
+        <Tabs
+          aria-label="Navegación principal"
+          selectedKey={activeKey}
+          onSelectionChange={(key: Key) => navigate(key as string)}
+          variant="light"
+          color="primary"
+          fullWidth
+          radius="none"
+          disableCursorAnimation
+          classNames={{
+            base: "w-full",
+            tabList: "w-full gap-0 bg-transparent p-0",
+            cursor: "hidden",
+            tab: "h-14 min-w-0 flex-1 rounded-none px-1 data-[hover-unselected=true]:opacity-100",
+            tabContent:
+              "flex flex-col items-center gap-1 whitespace-nowrap text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
+          }}
+        >
+          {TABS.map(({ key, label, icon: Icon }) => (
+            <Tab key={key} title={<><Icon size={22} strokeWidth={2} />{label}</>} />
+          ))}
+        </Tabs>
+      </div>
     </div>
   );
 }
