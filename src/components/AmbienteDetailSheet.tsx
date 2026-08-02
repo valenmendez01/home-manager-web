@@ -77,10 +77,9 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
         onOpenChange={(open) => !open && onClose()}
         placement="bottom"
         scrollBehavior="inside"
-        size="full"
         classNames={{
           wrapper: "items-end !p-0",
-          base: "m-0 max-h-[85vh] rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom",
+          base: "m-0 w-full max-w-full max-h-[85vh] rounded-t-3xl rounded-b-none bg-neutral-900 safe-bottom",
           body: "px-5 pb-6 pt-1",
           closeButton: "text-neutral-400 hover:bg-neutral-800",
         }}
@@ -90,7 +89,7 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
             drag="y"
             dragControls={dragControls}
             dragListener={false}
-            dragConstraints={{ top: 0, bottom: 0 }}
+            dragConstraints={{ top: 0, bottom: 400 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 100 || info.velocity.y > 500) onClose();
