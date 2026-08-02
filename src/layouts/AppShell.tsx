@@ -24,7 +24,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
         className="h-full overflow-y-auto safe-top"
-        style={{ paddingBottom: "calc(56px + 12px + env(safe-area-inset-bottom))" }}
+        style={{ bottom: "env(safe-area-inset-bottom)" }}
       >
         {children}
       </main>
