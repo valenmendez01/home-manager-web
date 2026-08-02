@@ -12,7 +12,7 @@ registerSW({ immediate: true });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <HeroUIProvider>
+    <HeroUIProvider className="h-full">
       {/* placement="top-center": en mobile abajo choca con el navbar fijo */}
       <ToastProvider placement="top-center" toastOffset={8} />
       <App />

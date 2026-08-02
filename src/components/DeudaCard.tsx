@@ -4,6 +4,8 @@ import { useAuthStore } from "@/store/authStore";
 import { usePagarDeuda } from "@/hooks/usePagarDeuda";
 import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
+import { Trash2 } from "lucide-react";
+import { useEliminarDeuda } from "@/hooks/useEliminarDeuda";
 
 interface Props {
   deuda: Deuda;
@@ -20,6 +22,9 @@ export default function DeudaCard({ deuda }: Props) {
   const esQuienDebe = deuda.debe === userId;
   const puedeMarcarPagada = esQuienDebe && deuda.estado === "pendiente";
 
+  const eliminarDeuda = useEliminarDeuda();
+  const esCreador = deuda.pagado_por === userId; // quien pagó = quien la cargó
+
   return (
     <div className="mb-3 rounded-2xl bg-neutral-900 p-4">
       <div className="flex items-start justify-between">
@@ -33,12 +38,8 @@ export default function DeudaCard({ deuda }: Props) {
       </div>
 
       <div className="mt-3 flex items-center justify-between">
-        <Chip 
-          color={deuda.estado === "pagada" ? "success" : "warning"} 
-          variant="flat" 
-          size="sm"
-        >
-            {deuda.estado === "pagada" ? "Pagada" : "Pendiente"}
+        <Chip color="warning" variant="flat" size="sm">
+          Pendiente
         </Chip>
 
         {puedeMarcarPagada && (
@@ -50,6 +51,19 @@ export default function DeudaCard({ deuda }: Props) {
             onPress={() => pagarDeuda.mutate(deuda.id)}
           >
             Pagar
+          </Button>
+        )}
+        {esCreador && (
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            className="ml-2"
+            isLoading={eliminarDeuda.isPending}
+            onPress={() => eliminarDeuda.mutate(deuda.id)}
+            aria-label="Eliminar deuda"
+          >
+            {!eliminarDeuda.isPending && <Trash2 size={18} color="#737373" />}
           </Button>
         )}
       </div>

@@ -18,9 +18,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-full flex-col justify-center bg-neutral-950 px-6">
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
-        <h1 className="mb-2 text-3xl font-semibold text-neutral-50">Home Manager</h1>
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-neutral-950 px-6">
+      <form onSubmit={handleLogin} className="flex w-full max-w-sm flex-col gap-4">
+        <h1 className="mb-2 text-center text-3xl font-semibold text-neutral-50">Inicia sesión</h1>
 
         <Input
           variant="bordered"

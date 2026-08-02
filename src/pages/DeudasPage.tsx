@@ -13,6 +13,7 @@ import { Button } from "@heroui/button";
 
 export default function DeudasPage() {
   const { data: deudas, isLoading } = useDeudas();
+  const pendientes = deudas?.filter((d) => d.estado === "pendiente") ?? [];
   const [modalVisible, setModalVisible] = useState(false);
   useRealtimeDeudas();
 
@@ -41,10 +42,10 @@ export default function DeudasPage() {
       <TotalesDeudasHeader deudas={deudas} />
 
       <div className="px-5 pb-6">
-        {deudas.length === 0 && (
-          <p className="mt-8 text-center text-sm text-neutral-500">No hay deudas registradas todavía</p>
+        {pendientes.length === 0 && (
+          <p className="mt-8 text-center text-sm text-neutral-500">No hay deudas pendientes</p>
         )}
-        {deudas.map((item: Deuda) => (
+        {pendientes.map((item: Deuda) => (
           <DeudaCard key={item.id} deuda={item} />
         ))}
         <HistorialPagos />

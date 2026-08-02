@@ -35,7 +35,7 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
     <div className="flex gap-3 px-5 pb-4 pt-2">
       <div className="flex-1 rounded-2xl bg-neutral-900 p-4">
         <p className="text-xs text-neutral-500">
-          {userId ? nombreUsuario(userId) : "Vos"} debe
+          Debés
         </p>
         <p className="mt-1 text-xl font-semibold text-red-400">{formatMonto(miDeuda)}</p>
       </div>

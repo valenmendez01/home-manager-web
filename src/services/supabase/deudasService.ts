@@ -53,3 +53,8 @@ export async function fetchPagosHistorial(): Promise<PagoConDeuda[]> {
   if (error) throw error;
   return data as unknown as PagoConDeuda[];
 }
+
+export async function eliminarDeuda(id: string) {
+  const { error } = await supabase.from("deudas").delete().eq("id", id);
+  if (error) throw error;
+}
