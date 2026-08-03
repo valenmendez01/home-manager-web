@@ -29,33 +29,36 @@ export default function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <div
-        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
-        style={{ bottom: "env(safe-area-inset-bottom)" }}
+      <Tabs
+        aria-label="Navegación principal"
+        selectedKey={activeKey}
+        onSelectionChange={(key: Key) => navigate(key as string)}
+        variant="light"
+        color="primary"
+        fullWidth
+        radius="none"
+        disableCursorAnimation
+        classNames={{
+          base: "fixed inset-x-0 bottom-0 z-50 border-t border-neutral-800 bg-black safe-bottom",
+          tabList: "gap-0 bg-transparent p-0",
+          cursor: "hidden",
+          tab: "h-14 rounded-none data-[hover-unselected=true]:opacity-100",
+          tabContent:
+            "flex flex-col items-center gap-1 text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
+        }}
       >
-        <Tabs
-          aria-label="Navegación principal"
-          selectedKey={activeKey}
-          onSelectionChange={(key: Key) => navigate(key as string)}
-          variant="light"
-          color="primary"
-          fullWidth
-          radius="full"
-          disableCursorAnimation
-          classNames={{
-            base: "w-full",
-            tabList: "w-full gap-0 bg-transparent p-0",
-            cursor: "hidden",
-            tab: "h-12 min-w-0 flex-1 rounded-none px-1 data-[hover-unselected=true]:opacity-100 border-none",
-            tabContent:
-              "flex items-center justify-center text-neutral-500 group-data-[selected=true]:text-blue-400",
-          }}
-        >
-          {TABS.map(({ key, label, icon: Icon }) => (
-            <Tab key={key} aria-label={label} title={<Icon size={22} strokeWidth={2} />} />
-          ))}
-        </Tabs>
-      </div>
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <Tab
+            key={key}
+            title={
+              <>
+                <Icon size={22} strokeWidth={2} />
+                {label}
+              </>
+            }
+          />
+        ))}
+      </Tabs>
     </div>
   );
 }
