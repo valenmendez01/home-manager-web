@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, Tab } from "@heroui/tabs";
 import { Home, Wallet, ShoppingCart } from "lucide-react";
-import { useEffect, useRef, Key, ReactNode } from "react";
+import { Key, ReactNode } from "react";
 
 const TABS = [
   { key: "/limpieza", label: "Limpieza", icon: Home },
@@ -18,26 +18,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const activeKey =
     TABS.find((tab) => tab.key === location.pathname)?.key ?? "/limpieza";
 
-  const mainRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    // Bug de WebKit en PWA standalone: los env(safe-area-inset-*) para
-    // elementos "fixed" no se calculan bien en el primer render, y recién
-    // se corrigen tras un scroll invisible apenas monta.
-    const el = mainRef.current;
-    if (!el) return;
-    el.scrollTop = 1;
-    requestAnimationFrame(() => {
-      el.scrollTop = 0;
-    });
-  }, []);
-
   return (
     <div className="h-full bg-neutral-950">
       {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
           nunca quede tapado; suma además el home-indicator de iOS */}
       <main
-        ref={mainRef}
         className="h-full overflow-y-auto safe-top"
         style={{ paddingBottom: "56px" }}
       >
@@ -45,7 +30,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       <div
-        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md [transform:translateZ(0)] [will-change:transform]"
+        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
         style={{ bottom: 0 }}
       >
         <Tabs
