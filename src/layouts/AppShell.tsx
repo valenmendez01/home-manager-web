@@ -30,7 +30,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       <div
-        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
+        className="fixed inset-x-4 z-50 overflow-hidden rounded-full border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
         style={{ bottom: "env(safe-area-inset-bottom)" }}
       >
         <Tabs
@@ -48,7 +48,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             cursor: "hidden",
             tab: "h-14 min-w-0 flex-1 rounded-none px-1 data-[hover-unselected=true]:opacity-100",
             tabContent:
-              "flex flex-col items-center gap-1 text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
+              "flex flex-col items-center gap-1 pt-1 text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
           }}
         >
           {TABS.map(({ key, label, icon: Icon }) => (
