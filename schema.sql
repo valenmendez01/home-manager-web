@@ -141,22 +141,16 @@ create policy "authenticated_full_access" on push_tokens
 
 create extension if not exists pg_net;
 
-create or replace function trigger_notificar_nueva_deuda()
-returns trigger as $$
-begin
-  perform net.http_post(
-    url := 'https://TU_PROJECT_ID.supabase.co/functions/v1/notificar-nueva-deuda',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer TU_SECRET_KEY'
-    ),
-    body := jsonb_build_object('record', row_to_json(new))
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
+-- En el Dashboard de Supabase → Database → Webhooks (misma sección que usaste en marguelli), creá uno nuevo:
+--   Table: deudas
+--   Events: Insert
+--   Type: Supabase Edge Functions
+--   Edge Function: notificar-nueva-deuda
+--   HTTP Method: POST (default)
+--   HTTP Headers: Content-Type: application/json (default)
 
-create trigger on_nueva_deuda
-  after insert on deudas
-  for each row
-  execute function trigger_notificar_nueva_deuda();
+-- Deployá la función:
+-- npx supabase functions deploy notificar-nueva-deuda --no-verify-jwt
+
+-- Secrets del servidor
+-- npx supabase secrets set VAPID_SUBJECT=mailto:tu@email.com VAPID_PUBLIC_KEY=xxxx VAPID_PRIVATE_KEY=xxxx

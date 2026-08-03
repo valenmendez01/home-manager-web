@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { queryClient } from "@/services/queryClient";
 import { useAuthStore } from "@/store/authStore";
 import { useAuthListener } from "@/hooks/useAuthListener";
+import { useRefetchOnResume } from "@/hooks/useRefetchOnResume";
 import LoginPage from "@/pages/LoginPage";
 import AppShell from "@/layouts/AppShell";
 import LimpiezaPage from "@/pages/LimpiezaPage";
@@ -12,6 +13,7 @@ import { Spinner } from "@heroui/spinner";
 
 function Root() {
   useAuthListener();
+  useRefetchOnResume();
 
   const session = useAuthStore((s) => s.session);
   const isInitialized = useAuthStore((s) => s.isInitialized);
