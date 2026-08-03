@@ -31,7 +31,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       <div
         className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
-        style={{ bottom: "-6px" }}
+        style={{ bottom: 0 }}
       >
         <Tabs
           aria-label="Navegación principal"

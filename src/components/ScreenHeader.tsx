@@ -15,7 +15,7 @@ export default function ScreenHeader({ title, subtitle, rightElement }: Props) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
-    <div className="flex items-center justify-between px-5 pb-3 pt-2">
+    <div className="mt-4 flex items-center justify-between px-5 pb-3 pt-2">
       <div>
         <h1 className="text-2xl font-semibold text-neutral-50">{title}</h1>
         {subtitle && <p className="mt-0.5 text-xs text-neutral-500">{subtitle}</p>}
