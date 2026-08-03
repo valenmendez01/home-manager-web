@@ -23,7 +23,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Bug de WebKit en PWA standalone: los env(safe-area-inset-*) para
     // elementos "fixed" no se calculan bien en el primer render, y recién
-    // se corrigen tras un scroll real. Forzamos uno invisible apenas monta.
+    // se corrigen tras un scroll invisible apenas monta.
     const el = mainRef.current;
     if (!el) return;
     el.scrollTop = 1;
