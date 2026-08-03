@@ -30,7 +30,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       <div
-        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"
+        className="fixed inset-x-4 z-50 overflow-hidden rounded-2xl border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md [transform:translateZ(0)] [will-change:transform]"
         style={{ bottom: 0 }}
       >
         <Tabs
