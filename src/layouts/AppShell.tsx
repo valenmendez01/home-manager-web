@@ -40,13 +40,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
           variant="light"
           color="primary"
           fullWidth
-          radius="none"
+          radius="full"
           disableCursorAnimation
           classNames={{
             base: "w-full",
             tabList: "w-full gap-0 bg-transparent p-0",
             cursor: "hidden",
-            tab: "h-14 min-w-0 flex-1 rounded-none px-1 data-[hover-unselected=true]:opacity-100",
+            tab: "h-16 min-w-0 flex-1 px-1 data-[hover-unselected=true]:opacity-100",
             tabContent:
               "flex flex-col items-center gap-1 whitespace-nowrap text-[11px] text-neutral-500 group-data-[selected=true]:text-blue-400",
           }}
