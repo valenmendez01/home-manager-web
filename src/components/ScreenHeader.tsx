@@ -35,7 +35,7 @@ export default function ScreenHeader({ title, subtitle, rightElement }: Props) {
         </Button>
       </div>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="sm" backdrop="opaque">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="xs" backdrop="opaque">
         <ModalContent>
           {(closeModal) => (
             <>
