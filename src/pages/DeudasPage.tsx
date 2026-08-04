@@ -48,7 +48,9 @@ export default function DeudasPage() {
         {pendientes.map((item: Deuda) => (
           <DeudaCard key={item.id} deuda={item} />
         ))}
-        <HistorialPagos />
+        <div className="mb-10">
+          <HistorialPagos />
+        </div>
       </div>
 
       <NuevaDeudaModal visible={modalVisible} onClose={() => setModalVisible(false)} />
