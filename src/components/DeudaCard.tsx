@@ -34,7 +34,7 @@ export default function DeudaCard({ deuda }: Props) {
             Pagó {nombreUsuario(deuda.pagado_por)} · {new Date(deuda.fecha).toLocaleDateString()}
           </p>
         </div>
-        <p className="text-lg font-semibold text-neutral-50">{formatMonto(deuda.monto_debe)}</p>
+        <p className="text-lg font-semibold text-neutral-50">{formatMonto(deuda.monto_total)}</p>
       </div>
 
       <div className="mt-3 flex items-center justify-between">

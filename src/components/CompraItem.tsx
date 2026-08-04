@@ -1,5 +1,5 @@
 import { useRef, useState, KeyboardEvent, PointerEvent } from "react";
-import { CheckSquare, Square, Trash2 } from "lucide-react";
+import { CheckSquare, Square } from "lucide-react";
 import { Compra } from "@/types/compras";
 import { useToggleCompra, useEliminarCompra, useEditarCompra } from "@/hooks/useComprasMutations";
 import { nombreUsuario } from "@/constants/usuarios";
@@ -112,10 +112,6 @@ export default function CompraItem({ compra }: Props) {
           </div>
         )}
       </div>
-
-      <Button isIconOnly variant="light" onPress={() => eliminar.mutate(compra.id)} className="pl-3 shrink-0" aria-label="Eliminar">
-        <Trash2 size={20} color="#737373" />
-      </Button>
     </div>
   );
 }

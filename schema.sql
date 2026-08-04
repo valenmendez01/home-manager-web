@@ -44,6 +44,26 @@ create table pagos (
 
 create index idx_deudas_estado on deudas(estado);
 
+-- Deshacer un pago: borra el registro y vuelve la deuda a "pendiente" en
+-- una sola transacción (evita que quede en un estado intermedio si algo falla).
+create or replace function deshacer_pago(p_pago_id uuid)
+returns void as $$
+declare
+  v_deuda_id uuid;
+begin
+  select deuda_id into v_deuda_id from pagos where id = p_pago_id;
+
+  if v_deuda_id is null then
+    raise exception 'Pago % no encontrado', p_pago_id;
+  end if;
+
+  delete from pagos where id = p_pago_id;
+  update deudas set estado = 'pendiente' where id = v_deuda_id;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function deshacer_pago(uuid) to authenticated;
+
 -- ============================================
 -- MÓDULO COMPRAS
 -- ============================================

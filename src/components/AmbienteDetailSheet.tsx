@@ -83,6 +83,7 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
         onOpenChange={(open) => !open && onClose()}
         placement="bottom"
         scrollBehavior="inside"
+        hideCloseButton
         classNames={{
           wrapper: "items-end !p-0",
           base: `m-0 w-full max-w-full ${
