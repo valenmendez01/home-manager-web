@@ -6,13 +6,10 @@ import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
 import { Trash2 } from "lucide-react";
 import { useEliminarDeuda } from "@/hooks/useEliminarDeuda";
+import { formatMonto } from "@/utils/formatMonto";
 
 interface Props {
   deuda: Deuda;
-}
-
-function formatMonto(monto: number) {
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(monto);
 }
 
 export default function DeudaCard({ deuda }: Props) {

@@ -7,10 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 import { addToast } from "@heroui/toast";
 import { Button } from "@heroui/button";
 import { Undo2 } from "lucide-react";
-
-function formatMonto(monto: number) {
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(monto);
-}
+import { formatMonto } from "@/utils/formatMonto";
 
 function nombreMes(offset: number) {
   const fecha = new Date();
@@ -41,7 +38,7 @@ function PagoRow({ pago }: { pago: PagoConDeuda }) {
   };
 
   return (
-    <div className="flex items-center justify-between border-b border-neutral-800 py-2">
+    <div className="flex items-center justify-between border-b border-neutral-800 py-2 mb-10">
       <div className="flex-1 pr-2">
         <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
         <p className="mt-0.5 text-xs text-neutral-500">

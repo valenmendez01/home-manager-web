@@ -28,7 +28,7 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
   const handleGuardar = async () => {
     if (!userId || !descripcion.trim() || !monto) return;
 
-    const montoTotal = parseFloat(monto.replace(",", "."));
+    const montoTotal = parseFloat(monto);
     if (isNaN(montoTotal) || montoTotal <= 0) return;
 
     const debe = otroUsuarioId(userId);
@@ -108,9 +108,9 @@ export default function NuevaDeudaModal({ visible, onClose }: Props) {
               <Input
                 variant="bordered"
                 placeholder="Monto total"
-                inputMode="decimal"
+                inputMode="numeric"
                 value={monto}
-                onValueChange={setMonto}
+                onValueChange={(value) => setMonto(value.replace(/\D/g, ""))}
               />
 
               {userId && (

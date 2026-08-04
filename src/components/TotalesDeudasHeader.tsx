@@ -1,13 +1,10 @@
 import { Deuda } from "@/types/deudas";
 import { useAuthStore } from "@/store/authStore";
 import { nombreUsuario, otroUsuarioId } from "@/constants/usuarios";
+import { formatMonto } from "@/utils/formatMonto";
 
 interface Props {
   deudas: Deuda[];
-}
-
-function formatMonto(monto: number) {
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(monto);
 }
 
 export default function TotalesDeudasHeader({ deudas }: Props) {
