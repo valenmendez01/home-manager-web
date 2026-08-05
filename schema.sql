@@ -174,3 +174,40 @@ create extension if not exists pg_net;
 
 -- Secrets del servidor
 -- npx supabase secrets set VAPID_SUBJECT=mailto:tu@email.com VAPID_PUBLIC_KEY=xxxx VAPID_PRIVATE_KEY=xxxx
+
+
+-- ============================================
+-- MÓDULO RECORDATORIOS DE PAGO
+-- ============================================
+create table recordatorios_pago (
+  id uuid primary key default gen_random_uuid(),
+  usuario_id uuid not null,
+  nombre text not null,
+  orden int not null default 0,
+  marcado boolean not null default false
+);
+
+alter table recordatorios_pago enable row level security;
+
+create policy "authenticated_full_access" on recordatorios_pago
+  for all to authenticated using (true) with check (true);
+
+alter publication supabase_realtime add table recordatorios_pago;
+
+insert into recordatorios_pago (usuario_id, nombre, orden) values
+  ('e0f6fad5-c137-4d34-81d0-fd2630a97cf5', 'Facultad', 1),
+  ('e0f6fad5-c137-4d34-81d0-fd2630a97cf5', 'Expensas', 2),
+  ('e0f6fad5-c137-4d34-81d0-fd2630a97cf5', 'Alquiler', 3),
+  ('e0f6fad5-c137-4d34-81d0-fd2630a97cf5', 'ABL', 4),
+  ('e0f6fad5-c137-4d34-81d0-fd2630a97cf5', 'AySa', 5),
+  ('16a7b308-a718-49f8-9845-20354176169f', 'Facultad', 1),
+  ('16a7b308-a718-49f8-9845-20354176169f', 'Alquiler', 2),
+  ('16a7b308-a718-49f8-9845-20354176169f', 'Metrogas', 3),
+  ('16a7b308-a718-49f8-9845-20354176169f', 'Edesur', 4);
+
+-- Desmarca todo el 1° de cada mes a las 3am UTC
+select cron.schedule(
+  'resetear-recordatorios-pago',
+  '0 3 1 * *',
+  $$ update recordatorios_pago set marcado = false where marcado = true; $$
+);

@@ -10,11 +10,19 @@ import ScreenHeader from "@/components/ScreenHeader";
 import HistorialPagos from "@/components/HistorialPagos";
 import { Skeleton } from "@heroui/skeleton";
 import { Button } from "@heroui/button";
+import { Bell } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { useRecordatorios } from "@/hooks/useRecordatorios";
+import RecordatoriosModal from "@/components/RecordatoriosModal";
 
 export default function DeudasPage() {
   const { data: deudas, isLoading } = useDeudas();
   const pendientes = deudas?.filter((d) => d.estado === "pendiente") ?? [];
   const [modalVisible, setModalVisible] = useState(false);
+  const [recordatoriosVisible, setRecordatoriosVisible] = useState(false);
+  const userId = useAuthStore((s) => s.user?.id);
+  const { data: recordatorios = [] } = useRecordatorios(userId);
+  const pendientesRecordatorios = recordatorios.filter((r) => !r.marcado).length;
   useRealtimeDeudas();
 
   if (isLoading || !deudas) {
@@ -33,9 +41,21 @@ export default function DeudasPage() {
       <ScreenHeader
         title="Deudas"
         rightElement={
-          <Button isIconOnly color="primary" radius="full" size="sm" aria-label="Nueva deuda" onPress={() => setModalVisible(true)}>
-            <Plus size={20} />
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Button isIconOnly variant="light" size="sm" aria-label="Recordatorios" onPress={() => setRecordatoriosVisible(true)}>
+                <Bell size={22} className="text-neutral-400" />
+              </Button>
+              {pendientesRecordatorios > 0 && (
+                <span className="pointer-events-none absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white">
+                  {pendientesRecordatorios}
+                </span>
+              )}
+            </div>
+            <Button isIconOnly color="primary" radius="full" size="sm" aria-label="Nueva deuda" onPress={() => setModalVisible(true)}>
+              <Plus size={20} />
+            </Button>
+          </div>
         }
       />
 
@@ -54,6 +74,11 @@ export default function DeudasPage() {
       </div>
 
       <NuevaDeudaModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <RecordatoriosModal
+        isOpen={recordatoriosVisible}
+        onClose={() => setRecordatoriosVisible(false)}
+        usuarioId={userId}
+      />
     </div>
   );
 }
