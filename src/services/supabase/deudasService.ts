@@ -63,3 +63,16 @@ export async function eliminarDeuda(id: string) {
   const { error } = await supabase.from("deudas").delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function saldarDeudas(deudorId: string, acreedorId: string) {
+  const { error } = await supabase.rpc("saldar_deudas", {
+    p_deudor: deudorId,
+    p_acreedor: acreedorId,
+  });
+  if (error) throw error;
+}
+
+export async function deshacerSaldo(saldoId: string) {
+  const { error } = await supabase.rpc("deshacer_saldo", { p_saldo_id: saldoId });
+  if (error) throw error;
+}

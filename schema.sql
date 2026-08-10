@@ -211,3 +211,51 @@ select cron.schedule(
   '0 3 1 * *',
   $$ update recordatorios_pago set marcado = false where marcado = true; $$
 );
+
+
+-- ============================================
+-- SALDAR DEUDA NETA (liquidar todo el balance entre los 2 usuarios de una sola vez)
+-- ============================================
+
+alter table pagos add column saldo_id uuid;
+
+create index idx_pagos_saldo on pagos(saldo_id);
+
+create or replace function saldar_deudas(p_deudor uuid, p_acreedor uuid)
+returns void as $$
+declare
+  v_saldo_id uuid := gen_random_uuid();
+  v_deuda record;
+begin
+  for v_deuda in
+    select id, debe
+    from deudas
+    where estado = 'pendiente'
+      and (
+        (pagado_por = p_deudor and debe = p_acreedor)
+        or (pagado_por = p_acreedor and debe = p_deudor)
+      )
+  loop
+    update deudas set estado = 'pagada' where id = v_deuda.id;
+
+    insert into pagos (deuda_id, pagado_por, saldo_id)
+    values (v_deuda.id, v_deuda.debe, v_saldo_id);
+  end loop;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function saldar_deudas(uuid, uuid) to authenticated;
+
+-- Deshacer un saldo completo: revierte todos los pagos que se generaron
+-- juntos en un mismo "Saldar deuda", en una sola transacción.
+create or replace function deshacer_saldo(p_saldo_id uuid)
+returns void as $$
+begin
+  update deudas set estado = 'pendiente'
+  where id in (select deuda_id from pagos where saldo_id = p_saldo_id);
+
+  delete from pagos where saldo_id = p_saldo_id;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function deshacer_saldo(uuid) to authenticated;
