@@ -1,7 +1,7 @@
 import { usePagosHistorial } from "@/hooks/usePagosHistorial";
 import { agruparPagosPorMes } from "@/utils/agruparPorMes";
 import { agruparPorSaldo, ItemHistorial } from "@/utils/agruparPorSaldo";
-import { nombreUsuario } from "@/constants/usuarios";
+import { nombreUsuario, otroUsuarioId } from "@/constants/usuarios";
 import { PagoConDeuda } from "@/types/deudas";
 import { useDeshacerPago } from "@/hooks/useDeshacerPago";
 import { useDeshacerSaldo } from "@/hooks/useDeshacerSaldo";
@@ -66,11 +66,15 @@ function PagoRow({ pago }: { pago: PagoConDeuda }) {
 }
 
 function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeuda[] }) {
+  const userId = useAuthStore((s) => s.user?.id);
   const deshacerSaldo = useDeshacerSaldo();
 
   const total = pagos.reduce((acc, p) => acc + Number(p.deuda.monto_debe), 0);
   const fecha = pagos[0].pagado_at;
-  const puedeDeshacer = esHoy(fecha);
+  const iniciadoPor = pagos[0].saldo_iniciado_por;
+  const acreedor = iniciadoPor ? otroUsuarioId(iniciadoPor) : undefined;
+
+  const puedeDeshacer = iniciadoPor === userId && esHoy(fecha);
 
   const handleDeshacer = () => {
     deshacerSaldo.mutate(saldoId, {
@@ -111,7 +115,11 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
         </div>
       ))}
       <div className="flex justify-end px-1 pt-1">
-        <p className="text-xs text-neutral-500">Total saldado: {formatMonto(total)}</p>
+        <p className="text-xs text-neutral-500">
+          {iniciadoPor && acreedor
+            ? `${nombreUsuario(iniciadoPor)} pagó ${formatMonto(total)} a ${nombreUsuario(acreedor)}`
+            : `Total saldado: ${formatMonto(total)}`}
+        </p>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ export interface Pago {
   pagado_por: string;
   pagado_at: string;
   saldo_id: string | null;
+  saldo_iniciado_por: string | null;
 }
 
 export interface NuevaDeudaInput {

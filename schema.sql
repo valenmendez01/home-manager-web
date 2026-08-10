@@ -218,6 +218,7 @@ select cron.schedule(
 -- ============================================
 
 alter table pagos add column saldo_id uuid;
+alter table pagos add column saldo_iniciado_por uuid;
 
 create index idx_pagos_saldo on pagos(saldo_id);
 
@@ -238,8 +239,8 @@ begin
   loop
     update deudas set estado = 'pagada' where id = v_deuda.id;
 
-    insert into pagos (deuda_id, pagado_por, saldo_id)
-    values (v_deuda.id, v_deuda.debe, v_saldo_id);
+    insert into pagos (deuda_id, pagado_por, saldo_id, saldo_iniciado_por)
+    values (v_deuda.id, v_deuda.debe, v_saldo_id, p_deudor);
   end loop;
 end;
 $$ language plpgsql security definer;
