@@ -69,10 +69,16 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
   const userId = useAuthStore((s) => s.user?.id);
   const deshacerSaldo = useDeshacerSaldo();
 
-  const total = pagos.reduce((acc, p) => acc + Number(p.deuda.monto_debe), 0);
   const fecha = pagos[0].pagado_at;
   const iniciadoPor = pagos[0].saldo_iniciado_por;
   const acreedor = iniciadoPor ? otroUsuarioId(iniciadoPor) : undefined;
+
+  // Neteo: sumamos lo que debía el que inició el saldo, restamos lo que
+  // le debían a él (mismo criterio que TotalesDeudasHeader).
+  const total = pagos.reduce((acc, p) => {
+    const signo = p.pagado_por === iniciadoPor ? 1 : -1;
+    return acc + signo * Number(p.deuda.monto_debe);
+  }, 0);
 
   const puedeDeshacer = iniciadoPor === userId && esHoy(fecha);
 
