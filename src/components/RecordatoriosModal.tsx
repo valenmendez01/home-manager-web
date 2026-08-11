@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { Alert } from "@heroui/alert";
+import { Card, CardBody } from "@heroui/card";
 import { Link } from "@heroui/link";
 import { CheckSquare, Square, Trash2, Plus, Pencil, CircleAlert } from "lucide-react";
 import { useRecordatorios } from "@/hooks/useRecordatorios";
@@ -61,13 +61,11 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
           </Button>
         </ModalHeader>
         <ModalBody className="pb-8">
-          <Alert
-            hideIconWrapper
-            color="warning"
-            className="mb-3"
-            title={
-              <span>
-                Recordá subir los comprobantes al{" "}
+          <Card className="mb-3 border border-yellow-500/30 bg-yellow-500/10 shadow-none">
+            <CardBody className="flex-row items-center gap-3 py-3">
+              <CircleAlert size={18} color="#EAB308" className="shrink-0" />
+              <span className="text-sm text-yellow-500">
+                Subir los comprobantes al{" "}
                 <Link
                   size="sm"
                   isExternal
@@ -79,8 +77,8 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
                   Drive
                 </Link>
               </span>
-            }
-          />
+            </CardBody>
+          </Card>
           {editando && (
             <div className="flex items-center gap-2 pb-2">
               <Input
