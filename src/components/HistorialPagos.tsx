@@ -95,7 +95,7 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
 
   return (
     <div className="mb-1 mt-4 rounded-xl border border-neutral-800 bg-neutral-900/50 p-2">
-      <div className="flex items-center justify-between px-1 pb-1">
+      <div className="flex items-center justify-between px-1 py-1">
         <p className="text-xs font-medium uppercase text-neutral-500">
           Saldo completo · {new Date(fecha).toLocaleDateString()}
         </p>
@@ -111,7 +111,7 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
         )}
       </div>
       {pagos.map((pago) => (
-        <div key={pago.id} className="flex items-center justify-between border-b border-neutral-800 py-2 last:border-b-0">
+        <div key={pago.id} className="flex items-center justify-between border-b border-neutral-800 py-2 px-1 last:border-b-0">
           <div className="flex-1 pr-2">
             <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
             <p className="mt-0.5 text-xs text-neutral-500">Pagó {nombreUsuario(pago.pagado_por)}</p>

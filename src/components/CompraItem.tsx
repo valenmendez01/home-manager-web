@@ -103,7 +103,7 @@ export default function CompraItem({ compra }: Props) {
           />
         ) : (
           <div>
-            <p className={`truncate text-base ${comprado ? "text-neutral-500 line-through" : "text-neutral-50"}`}>
+            <p className={`text-base ${comprado ? "text-neutral-500 line-through" : "text-neutral-50"}`}>
               {compra.nombre}
             </p>
             <p className="mt-0.5 text-xs text-neutral-600">
