@@ -2,6 +2,7 @@ import { useState, FormEvent } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import PageFadeIn from "@/components/PageFadeIn";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-neutral-950 px-6">
+    <PageFadeIn className="flex min-h-dvh flex-col items-center justify-center bg-neutral-950 px-6">
       <form onSubmit={handleLogin} className="flex w-full max-w-sm flex-col gap-4">
         <h1 className="mb-2 text-center text-3xl font-semibold text-neutral-50">Inicia sesión</h1>
 
@@ -47,6 +48,6 @@ export default function LoginPage() {
           Ingresar
         </Button>
       </form>
-    </div>
+    </PageFadeIn>
   );
 }

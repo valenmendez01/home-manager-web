@@ -7,6 +7,7 @@ import { AmbienteConEstado } from "@/types/limpieza";
 import { useRealtimeLimpieza } from "@/hooks/useRealtimeLimpieza";
 import ScreenHeader from "@/components/ScreenHeader";
 import { Skeleton } from "@heroui/skeleton";
+import PageFadeIn from "@/components/PageFadeIn";
 
 export default function LimpiezaPage() {
   const { data: ambientes, isLoading } = useAmbientesConEstado();
@@ -28,7 +29,7 @@ export default function LimpiezaPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-neutral-950">
+    <PageFadeIn className="flex min-h-full flex-col bg-neutral-950">
       <ScreenHeader title="Limpieza" />
       <ProgresoHeader ambientes={ambientes} />
 
@@ -37,6 +38,6 @@ export default function LimpiezaPage() {
       </div>
 
       <AmbienteDetailSheet ambiente={seleccionado} onClose={() => setSeleccionado(null)} />
-    </div>
+    </PageFadeIn>
   );
 }

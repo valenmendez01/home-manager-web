@@ -5,6 +5,7 @@ import AgregarCompraInput from "@/components/AgregarCompraInput";
 import { Compra } from "@/types/compras";
 import ScreenHeader from "@/components/ScreenHeader";
 import { Skeleton } from "@heroui/skeleton";
+import PageFadeIn from "@/components/PageFadeIn";
 
 export default function ComprasPage() {
   const { data: compras, isLoading } = useCompras();
@@ -22,7 +23,7 @@ export default function ComprasPage() {
   }
 
   return (
-    <div className="bg-neutral-950">
+    <PageFadeIn className="bg-neutral-950">
       <ScreenHeader title="Compras" />
 
       <AgregarCompraInput />
@@ -35,6 +36,6 @@ export default function ComprasPage() {
           <CompraItem key={item.id} compra={item} />
         ))}
       </div>
-    </div>
+    </PageFadeIn>
   );
 }

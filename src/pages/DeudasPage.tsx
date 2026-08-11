@@ -14,6 +14,7 @@ import { Bell } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useRecordatorios } from "@/hooks/useRecordatorios";
 import RecordatoriosModal from "@/components/RecordatoriosModal";
+import PageFadeIn from "@/components/PageFadeIn";
 
 export default function DeudasPage() {
   const { data: deudas, isLoading } = useDeudas();
@@ -37,7 +38,7 @@ export default function DeudasPage() {
   }
 
   return (
-    <div className="bg-neutral-950">
+    <PageFadeIn className="bg-neutral-950">
       <ScreenHeader
         title="Deudas"
         rightElement={
@@ -79,6 +80,6 @@ export default function DeudasPage() {
         onClose={() => setRecordatoriosVisible(false)}
         usuarioId={userId}
       />
-    </div>
+    </PageFadeIn>
   );
 }
