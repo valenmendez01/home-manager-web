@@ -22,7 +22,7 @@ export default function AgregarCompraInput() {
   };
 
   return (
-    <div className="flex items-center gap-2 px-5 pb-3 mt-2">
+    <div className="flex items-center gap-2 px-5 pb-3 mt-2 mb-3">
       <Input
         variant="flat"
         placeholder="Agregar producto..."

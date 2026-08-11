@@ -27,7 +27,7 @@ export default function ComprasPage() {
 
       <AgregarCompraInput />
 
-      <div className="px-5 pb-6">
+      <div className="px-5 pb-6 mb-10">
         {compras.length === 0 && (
           <p className="mt-8 text-center text-sm text-neutral-500">No hay productos en la lista</p>
         )}
