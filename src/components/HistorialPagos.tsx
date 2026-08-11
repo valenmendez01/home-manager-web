@@ -94,7 +94,7 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
   };
 
   return (
-    <div className="mb-1 rounded-xl border border-neutral-800 bg-neutral-900/50 p-2">
+    <div className="mb-1 mt-4 rounded-xl border border-neutral-800 bg-neutral-900/50 p-2">
       <div className="flex items-center justify-between px-1 pb-1">
         <p className="text-xs font-medium uppercase text-neutral-500">
           Saldo completo · {new Date(fecha).toLocaleDateString()}
@@ -103,12 +103,11 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
           <Button
             size="sm"
             variant="light"
+            isIconOnly
             isLoading={deshacerSaldo.isPending}
             onPress={handleDeshacer}
             startContent={!deshacerSaldo.isPending && <Undo2 size={14} color="#737373" />}
-          >
-            Deshacer saldo
-          </Button>
+          />
         )}
       </div>
       {pagos.map((pago) => (
@@ -120,7 +119,7 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
           <p className="text-sm font-medium text-neutral-300">{formatMonto(pago.deuda.monto_debe)}</p>
         </div>
       ))}
-      <div className="flex justify-end px-1 pt-1">
+      <div className="flex justify-end px-1 my-2">
         <p className="text-xs text-neutral-500">
           {iniciadoPor && acreedor
             ? `${nombreUsuario(iniciadoPor)} pagó ${formatMonto(total)} a ${nombreUsuario(acreedor)}`

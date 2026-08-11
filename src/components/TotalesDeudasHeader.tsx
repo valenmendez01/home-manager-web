@@ -15,7 +15,6 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
   const userId = useAuthStore((s) => s.user?.id);
   const otroId = userId ? otroUsuarioId(userId) : undefined;
   const saldarDeudas = useSaldarDeudas();
-  const [confirmando, setConfirmando] = useState(false);
 
   const pendientes = deudas.filter((d) => d.estado === "pendiente");
 
@@ -40,7 +39,6 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
       { deudorId: userId, acreedorId: otroId },
       {
         onSuccess: () => {
-          setConfirmando(false);
           addToast({
             title: "Deuda saldada",
             description: "Se marcaron todas las deudas pendientes como pagadas.",
@@ -73,28 +71,19 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
         </div>
       </div>
 
-      {miDeuda > 0 && (
-        <div className="mt-3">
-          {!confirmando ? (
-            <Button color="primary" variant="flat" size="sm" fullWidth onPress={() => setConfirmando(true)}>
-              Saldar deuda
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2 rounded-2xl bg-neutral-900 p-3">
-              <p className="flex-1 text-xs text-neutral-400">
-                ¿Confirmás que le transferiste {formatMonto(miDeuda)} a{" "}
-                {otroId ? nombreUsuario(otroId) : "el otro"}?
-              </p>
-              <Button size="sm" variant="light" onPress={() => setConfirmando(false)}>
-                Cancelar
-              </Button>
-              <Button size="sm" color="primary" isLoading={saldarDeudas.isPending} onPress={handleSaldar}>
-                Confirmar
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      <div className="mt-3">
+        <Button
+          color="primary"
+          variant="flat"
+          size="sm"
+          fullWidth
+          isDisabled={pendientes.length <= 1}
+          isLoading={saldarDeudas.isPending}
+          onPress={handleSaldar}
+        >
+          Saldar deuda total
+        </Button>
+      </div>
     </div>
   );
 }

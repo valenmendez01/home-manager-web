@@ -31,7 +31,10 @@ export default function DeudaCard({ deuda }: Props) {
             Pagó {nombreUsuario(deuda.pagado_por)} · {new Date(deuda.fecha).toLocaleDateString()}
           </p>
         </div>
-        <p className="text-lg font-semibold text-neutral-50">{formatMonto(deuda.monto_total)}</p>
+        <div className="flex flex-col items-end">
+          <p className="text-lg font-semibold text-neutral-50">{formatMonto(deuda.monto_total)}</p>
+          <p className="text-xs text-neutral-500">/ {formatMonto(deuda.monto_total / 2)}</p>
+        </div>
       </div>
 
       <div className="mt-3 flex items-center justify-between">
@@ -47,7 +50,7 @@ export default function DeudaCard({ deuda }: Props) {
             isLoading={pagarDeuda.isPending} 
             onPress={() => pagarDeuda.mutate(deuda.id)}
           >
-            Pagar
+            Saldar
           </Button>
         )}
         {esCreador && (
