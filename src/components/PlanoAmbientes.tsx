@@ -71,11 +71,9 @@ export default function PlanoAmbientes({ ambientes, onSelect }: Props) {
           const { x: cx, y: cy } = centroid(points);
           const estadoLabel = !ambiente
             ? ""
-            : ambiente.diasTranscurridos === null
+            : !ambiente.ultimaLimpieza
             ? "Sin limpiar"
-            : ambiente.diasTranscurridos === 0
-            ? "Hoy"
-            : `Hace ${ambiente.diasTranscurridos}d`;
+            : new Date(ambiente.ultimaLimpieza.realizado_at).toLocaleDateString();
 
           return (
             <g key={nombre}>

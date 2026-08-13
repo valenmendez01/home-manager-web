@@ -147,10 +147,10 @@ export default function AmbienteDetailSheet({ ambiente, onClose }: Props) {
                     {marcarLimpio.isPending ? "Guardando..." : "Marcar como limpio"}
                   </Button>
 
-                  <p className="mb-2 mt-6 text-sm font-medium text-neutral-300">Historial</p>
+                  <p className="mt-6 text-md font-medium text-neutral-300">Historial</p>
                   {isLoading && <p className="text-sm text-neutral-300">Cargando...</p>}
                   {!isLoading && (historial ?? []).length === 0 && (
-                    <p className="text-sm text-neutral-300">Sin registros todavía</p>
+                    <p className="text-md text-neutral-300">Sin registros todavía</p>
                   )}
 
                   {(historial ?? []).map((item: Limpieza, index: number) => {

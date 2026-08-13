@@ -287,3 +287,122 @@ end;
 $$ language plpgsql security definer;
 
 grant execute on function deshacer_saldo(uuid) to authenticated;
+
+
+-- ============================================
+-- HISTORIAL DE LIMPIEZA: conservar solo las 2 últimas activas
+-- por ambiente, con "undo" automático al borrar por error.
+-- ============================================
+
+-- 1) Columna que marca si la limpieza cuenta como "vigente"
+alter table limpiezas add column activa boolean not null default true;
+
+-- 2) Migración de datos existentes: de lo que ya hay, dejamos
+--    activas solo las 2 últimas por ambiente...
+with ranked as (
+  select id, ambiente_id,
+         row_number() over (partition by ambiente_id order by realizado_at desc) as rn
+  from limpiezas
+)
+update limpiezas l
+set activa = false
+from ranked r
+where l.id = r.id and r.rn > 2;
+
+-- ...y de las que quedaron archivadas, nos quedamos solo con la
+--    candidata más reciente por ambiente (el resto se borra definitivo,
+--    para no arrancar con basura acumulada).
+with archivadas as (
+  select id, ambiente_id,
+         row_number() over (partition by ambiente_id order by realizado_at desc) as rn
+  from limpiezas
+  where activa = false
+)
+delete from limpiezas
+where id in (select id from archivadas where rn > 1);
+
+-- 3) Índice para las consultas por ambiente + activa (la app va a filtrar por esto)
+create index idx_limpiezas_ambiente_activa
+  on limpiezas(ambiente_id, realizado_at desc)
+  where activa = true;
+
+-- ============================================
+-- TRIGGER 1: al insertar, si quedan más de 2 activas, archiva la(s) más vieja(s)
+-- ============================================
+create or replace function fn_limpieza_archivar_excedentes()
+returns trigger as $$
+declare
+  v_activas int;
+  v_excedente int;
+begin
+  select count(*) into v_activas
+  from limpiezas
+  where ambiente_id = new.ambiente_id and activa = true;
+
+  v_excedente := v_activas - 2;
+
+  if v_excedente > 0 then
+    -- Solo guardamos 1 candidata a volver: borramos definitivo cualquier
+    -- archivada anterior de este ambiente antes de archivar la nueva.
+    delete from limpiezas
+    where ambiente_id = new.ambiente_id
+      and activa = false;
+
+    -- Archiva la(s) más vieja(s) activa(s) que sobran (normalmente 1)
+    update limpiezas
+    set activa = false
+    where id in (
+      select id from limpiezas
+      where ambiente_id = new.ambiente_id
+        and activa = true
+      order by realizado_at asc
+      limit v_excedente
+    );
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_limpieza_archivar_excedentes
+after insert on limpiezas
+for each row
+execute function fn_limpieza_archivar_excedentes();
+
+-- ============================================
+-- TRIGGER 2: al borrar una activa, si quedan menos de 2 activas,
+-- reactiva automáticamente la última archivada de ese ambiente
+-- ============================================
+create or replace function fn_limpieza_reactivar_archivada()
+returns trigger as $$
+declare
+  v_activas int;
+begin
+  select count(*) into v_activas
+  from limpiezas
+  where ambiente_id = old.ambiente_id and activa = true;
+
+  if v_activas < 2 then
+    update limpiezas
+    set activa = true
+    where id = (
+      select id from limpiezas
+      where ambiente_id = old.ambiente_id
+        and activa = false
+      order by realizado_at desc
+      limit 1
+    );
+  end if;
+
+  return old;
+end;
+$$ language plpgsql;
+
+-- El "when (old.activa = true)" es clave: evita que este trigger se dispare
+-- cuando el propio trigger 1 borra una candidata archivada vieja (activa = false),
+-- lo que rompería la lógica por recursión cruzada entre ambos triggers.
+create trigger trg_limpieza_reactivar_archivada
+after delete on limpiezas
+for each row
+when (old.activa = true)
+execute function fn_limpieza_reactivar_archivada();

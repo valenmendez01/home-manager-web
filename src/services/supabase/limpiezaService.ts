@@ -16,6 +16,7 @@ export async function fetchUltimasLimpiezas(): Promise<Limpieza[]> {
   const { data, error } = await supabase
     .from("limpiezas")
     .select("*")
+    .eq("activa", true)
     .order("realizado_at", { ascending: false });
 
   if (error) throw error;
@@ -23,10 +24,13 @@ export async function fetchUltimasLimpiezas(): Promise<Limpieza[]> {
 }
 
 export async function fetchHistorialAmbiente(ambienteId: string): Promise<Limpieza[]> {
+  // Solo las últimas 2 activas: lo demás lo maneja el trigger en la base
+  // (archiva la más vieja al agregar una 3ra, y la reactiva si se borra por error).
   const { data, error } = await supabase
     .from("limpiezas")
     .select("*")
     .eq("ambiente_id", ambienteId)
+    .eq("activa", true)
     .order("realizado_at", { ascending: false });
 
   if (error) throw error;
