@@ -406,3 +406,19 @@ after delete on limpiezas
 for each row
 when (old.activa = true)
 execute function fn_limpieza_reactivar_archivada();
+
+-- ============================================
+-- RECORDATORIOS DE PAGO: vencimiento recurrente por día del mes
+-- (en vez de una fecha con mes/año, que no tiene sentido para algo
+-- que se repite todos los meses, ej "todos los 8")
+-- ============================================
+
+alter table recordatorios_pago rename column fecha_vencimiento to dia_vencimiento;
+
+alter table recordatorios_pago
+  alter column dia_vencimiento type integer
+  using extract(day from dia_vencimiento)::integer;
+
+alter table recordatorios_pago
+  add constraint dia_vencimiento_valido
+  check (dia_vencimiento is null or dia_vencimiento between 1 and 31);

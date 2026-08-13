@@ -12,22 +12,48 @@ webPush.setVapidDetails(
   Deno.env.get("VAPID_PRIVATE_KEY")!
 );
 
+// Dado un "día del mes" (1-31) devuelve la próxima fecha real en que cae,
+// tomando como hoy la fecha pasada. Si el día ya pasó este mes, usa el
+// mes siguiente. Si el mes no tiene ese día (ej. 31 en febrero), lo
+// clampea al último día del mes.
+function proximoVencimiento(diaVencimiento: number, hoy: Date): Date {
+  const clamp = (anio: number, mes: number) => {
+    const ultimoDiaDelMes = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate();
+    const dia = Math.min(diaVencimiento, ultimoDiaDelMes);
+    return new Date(Date.UTC(anio, mes, dia));
+  };
+
+  const anio = hoy.getUTCFullYear();
+  const mes = hoy.getUTCMonth();
+
+  let candidato = clamp(anio, mes);
+  if (candidato < hoy) {
+    candidato = clamp(anio, mes + 1);
+  }
+  return candidato;
+}
+
 Deno.serve(async () => {
   try {
     const ahora = new Date();
-    const en24hs = new Date(ahora.getTime() + 24 * 60 * 60 * 1000);
+    const hoy = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), ahora.getUTCDate()));
+    const en24hs = new Date(hoy.getTime() + 24 * 60 * 60 * 1000);
 
-    const { data: recordatorios, error } = await supabaseAdmin
+    const { data: candidatos, error } = await supabaseAdmin
       .from("recordatorios_pago")
-      .select("id, usuario_id, nombre, fecha_vencimiento")
+      .select("id, usuario_id, nombre, dia_vencimiento")
       .eq("marcado", false)
       .eq("notificado", false)
-      .not("fecha_vencimiento", "is", null)
-      .lte("fecha_vencimiento", en24hs.toISOString().slice(0, 10))
-      .gte("fecha_vencimiento", ahora.toISOString().slice(0, 10));
+      .not("dia_vencimiento", "is", null);
 
     if (error) throw error;
-    if (!recordatorios || recordatorios.length === 0) {
+
+    const recordatorios = (candidatos ?? []).filter((r) => {
+      const vencimiento = proximoVencimiento(r.dia_vencimiento, hoy);
+      return vencimiento >= hoy && vencimiento <= en24hs;
+    });
+
+    if (recordatorios.length === 0) {
       return new Response(JSON.stringify({ sent: 0 }), { status: 200 });
     }
 
@@ -45,7 +71,7 @@ Deno.serve(async () => {
       const subscription = JSON.parse(tokenRow.token);
       const mensaje = JSON.stringify({
         title: `ALERTA - Pagar ${r.nombre}`,
-        body: `Vence el ${r.fecha_vencimiento}`,
+        body: `Vence el día ${r.dia_vencimiento} de este mes`,
         data: { tipo: "vencimiento_recordatorio", recordatorioId: r.id },
       });
 

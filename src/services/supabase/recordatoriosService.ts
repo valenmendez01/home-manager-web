@@ -28,10 +28,10 @@ export async function eliminarRecordatorio(id: string) {
   if (error) throw error;
 }
 
-export async function actualizarVencimiento(id: string, fecha: string | null) {
+export async function actualizarVencimiento(id: string, dia: number | null) {
   const { error } = await supabase
     .from("recordatorios_pago")
-    .update({ fecha_vencimiento: fecha, notificado: false })
+    .update({ dia_vencimiento: dia, notificado: false })
     .eq("id", id);
   if (error) throw error;
 }

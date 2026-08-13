@@ -4,8 +4,8 @@ import { actualizarVencimiento } from "@/services/supabase/recordatoriosService"
 export function useActualizarVencimiento(usuarioId?: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, fecha }: { id: string; fecha: string | null }) =>
-      actualizarVencimiento(id, fecha),
+    mutationFn: ({ id, dia }: { id: string; dia: number | null }) =>
+      actualizarVencimiento(id, dia),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recordatorios", usuarioId] });
     },

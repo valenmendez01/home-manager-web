@@ -9,14 +9,23 @@ import { useRecordatorios } from "@/hooks/useRecordatorios";
 import { useToggleRecordatorio } from "@/hooks/useToggleRecordatorio";
 import { useCrearRecordatorio } from "@/hooks/useCrearRecordatorio";
 import { useEliminarRecordatorio } from "@/hooks/useEliminarRecordatorio";
-import { DatePicker } from "@heroui/date-picker";
-import { parseDate, CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { useActualizarVencimiento } from "@/hooks/useActualizarVencimiento";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   usuarioId?: string;
+}
+
+// Próxima fecha real en la que cae un día del mes (ej. día 31 en febrero
+// cae el 28/29). Se usa solo para saber si ya venció este ciclo.
+function proximoVencimiento(diaVencimiento: number, hoy: Date): Date {
+  const clamp = (anio: number, mes: number) => {
+    const ultimoDiaDelMes = new Date(anio, mes + 1, 0).getDate();
+    return new Date(anio, mes, Math.min(diaVencimiento, ultimoDiaDelMes));
+  };
+  const candidato = clamp(hoy.getFullYear(), hoy.getMonth());
+  return candidato < hoy ? clamp(hoy.getFullYear(), hoy.getMonth() + 1) : candidato;
 }
 
 export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props) {
@@ -38,6 +47,16 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
       { nombre, orden: siguienteOrden },
       { onSuccess: () => setNombreNuevo("") }
     );
+  };
+
+  const handleCambiarDia = (id: string, valor: string) => {
+    if (valor === "") {
+      actualizarVencimiento.mutate({ id, dia: null });
+      return;
+    }
+    const dia = Number(valor);
+    if (!Number.isInteger(dia) || dia < 1 || dia > 31) return;
+    actualizarVencimiento.mutate({ id, dia });
   };
 
   return (
@@ -107,7 +126,12 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
           )}
 
           {recordatorios.map((r) => {
-            const vencida = r.fecha_vencimiento && !r.marcado && new Date(r.fecha_vencimiento) < today(getLocalTimeZone()).toDate(getLocalTimeZone());
+            const hoy = new Date();
+            const vencida =
+              r.dia_vencimiento != null &&
+              !r.marcado &&
+              proximoVencimiento(r.dia_vencimiento, hoy).toDateString() === hoy.toDateString();
+
             return (
               <div key={r.id} className="flex items-center gap-3 border-b border-neutral-800 py-3 last:border-b-0">
                 <div
@@ -122,23 +146,23 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
                       {r.nombre}
                     </p>
                     <p className={`text-xs ${vencida ? "text-red-400" : "text-neutral-500"}`}>
-                      {r.fecha_vencimiento
-                        ? new Date(r.fecha_vencimiento).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
-                        : "Sin vencimiento"}
+                      {r.dia_vencimiento != null ? `Vence el día ${r.dia_vencimiento} de cada mes` : "Sin vencimiento"}
                     </p>
                   </div>
                 </div>
 
                 {editando && (
                   <div className="flex items-center gap-1">
-                    <DatePicker
+                    <Input
+                      type="number"
                       size="sm"
-                      className="w-36"
-                      aria-label={`Vencimiento de ${r.nombre}`}
-                      value={r.fecha_vencimiento ? parseDate(r.fecha_vencimiento) : null}
-                      onChange={(fecha: CalendarDate | null) =>
-                        actualizarVencimiento.mutate({ id: r.id, fecha: fecha ? fecha.toString() : null })
-                      }
+                      className="w-20"
+                      min={1}
+                      max={31}
+                      placeholder="Día"
+                      aria-label={`Día de vencimiento de ${r.nombre}`}
+                      value={r.dia_vencimiento != null ? String(r.dia_vencimiento) : ""}
+                      onValueChange={(valor) => handleCambiarDia(r.id, valor)}
                     />
                     <Button
                       isIconOnly
