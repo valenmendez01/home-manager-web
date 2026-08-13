@@ -212,6 +212,33 @@ select cron.schedule(
   $$ update recordatorios_pago set marcado = false where marcado = true; $$
 );
 
+alter table recordatorios_pago add column fecha_vencimiento date;
+alter table recordatorios_pago add column notificado boolean not null default false;
+
+-- Desmarca todo el 1° de cada mes a las 3am UTC (reemplaza el cron.schedule existente)
+select cron.unschedule('resetear-recordatorios-pago');
+
+select cron.schedule(
+  'resetear-recordatorios-pago',
+  '0 3 1 * *',
+  $$ update recordatorios_pago set marcado = false, notificado = false where marcado = true; $$
+);
+
+-- Cada 6 horas, le pega a la edge function que revisa vencimientos próximos
+select cron.schedule(
+  'notificar-vencimientos-recordatorios',
+  '0 */6 * * *',
+  $$
+  select net.http_post(
+    url := 'https://<TU_PROJECT_REF>.supabase.co/functions/v1/notificar-vencimientos',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer <TU_SERVICE_ROLE_KEY_O_ANON_KEY>'
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
 
 -- ============================================
 -- SALDAR DEUDA NETA (liquidar todo el balance entre los 2 usuarios de una sola vez)

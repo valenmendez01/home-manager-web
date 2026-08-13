@@ -1,6 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "../hero.ts";
+@source "../node_modules/@heroui/theme/dist/components/tabs.js";
+@source "../node_modules/@heroui/theme/dist/components/button.js";
+@source "../node_modules/@heroui/theme/dist/components/modal.js";
+@source "../node_modules/@heroui/theme/dist/components/toast.js";
+@source "../node_modules/@heroui/theme/dist/components/spinner.js";
+@source "../node_modules/@heroui/theme/dist/components/input.js";
+@source "../node_modules/@heroui/theme/dist/components/chip.js";
+@source "../node_modules/@heroui/theme/dist/components/skeleton.js";
+@source "../node_modules/@heroui/theme/dist/components/alert.js";
+@source "../node_modules/@heroui/theme/dist/components/card.js";
+@source "../node_modules/@heroui/theme/dist/components/date-picker.js";
+@source "../node_modules/@heroui/theme/dist/components/link.js";
+
+@theme {
+  --color-app-bg: #0A0A0A;
+  --color-app-surface: #171717;
+  --color-app-border: #262626;
+}
 
 html,
 body,

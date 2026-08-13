@@ -9,6 +9,9 @@ import { useRecordatorios } from "@/hooks/useRecordatorios";
 import { useToggleRecordatorio } from "@/hooks/useToggleRecordatorio";
 import { useCrearRecordatorio } from "@/hooks/useCrearRecordatorio";
 import { useEliminarRecordatorio } from "@/hooks/useEliminarRecordatorio";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate, CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import { useActualizarVencimiento } from "@/hooks/useActualizarVencimiento";
 
 interface Props {
   isOpen: boolean;
@@ -24,6 +27,8 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
 
   const [nombreNuevo, setNombreNuevo] = useState("");
   const [editando, setEditando] = useState(false);
+
+  const actualizarVencimiento = useActualizarVencimiento(usuarioId);
 
   const handleAgregar = () => {
     const nombre = nombreNuevo.trim();
@@ -101,36 +106,55 @@ export default function RecordatoriosModal({ isOpen, onClose, usuarioId }: Props
             </div>
           )}
 
-          {recordatorios.map((r) => (
-            <div
-              key={r.id}
-              className="flex items-center gap-3 border-b border-neutral-800 py-3 last:border-b-0"
-            >
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => toggle.mutate({ id: r.id, marcado: !r.marcado })}
-                className="flex flex-1 items-center gap-3"
-              >
-                {r.marcado ? <CheckSquare size={22} color="#4ADE80" /> : <Square size={22} color="#737373" />}
-                <p className={`text-base ${r.marcado ? "text-neutral-500 line-through" : "text-neutral-50"}`}>
-                  {r.nombre}
-                </p>
-              </div>
-              {editando && (
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  isLoading={eliminar.isPending}
-                  onPress={() => eliminar.mutate(r.id)}
-                  aria-label="Eliminar recordatorio"
+          {recordatorios.map((r) => {
+            const vencida = r.fecha_vencimiento && !r.marcado && new Date(r.fecha_vencimiento) < today(getLocalTimeZone()).toDate(getLocalTimeZone());
+            return (
+              <div key={r.id} className="flex items-center gap-3 border-b border-neutral-800 py-3 last:border-b-0">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => toggle.mutate({ id: r.id, marcado: !r.marcado })}
+                  className="flex flex-1 items-center gap-3"
                 >
-                  {!eliminar.isPending && <Trash2 size={18} color="#737373" />}
-                </Button>
-              )}
-            </div>
-          ))}
+                  {r.marcado ? <CheckSquare size={22} color="#4ADE80" /> : <Square size={22} color="#737373" />}
+                  <div>
+                    <p className={`text-base ${r.marcado ? "text-neutral-500 line-through" : "text-neutral-50"}`}>
+                      {r.nombre}
+                    </p>
+                    <p className={`text-xs ${vencida ? "text-red-400" : "text-neutral-500"}`}>
+                      {r.fecha_vencimiento
+                        ? new Date(r.fecha_vencimiento).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
+                        : "Sin vencimiento"}
+                    </p>
+                  </div>
+                </div>
+
+                {editando && (
+                  <div className="flex items-center gap-1">
+                    <DatePicker
+                      size="sm"
+                      className="w-36"
+                      aria-label={`Vencimiento de ${r.nombre}`}
+                      value={r.fecha_vencimiento ? parseDate(r.fecha_vencimiento) : null}
+                      onChange={(fecha: CalendarDate | null) =>
+                        actualizarVencimiento.mutate({ id: r.id, fecha: fecha ? fecha.toString() : null })
+                      }
+                    />
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      size="sm"
+                      isLoading={eliminar.isPending}
+                      onPress={() => eliminar.mutate(r.id)}
+                      aria-label="Eliminar recordatorio"
+                    >
+                      {!eliminar.isPending && <Trash2 size={18} color="#737373" />}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </ModalBody>
       </ModalContent>
     </Modal>

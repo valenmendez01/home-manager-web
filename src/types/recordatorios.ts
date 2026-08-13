@@ -4,4 +4,5 @@ export interface RecordatorioPago {
   nombre: string;
   orden: number;
   marcado: boolean;
+  fecha_vencimiento: string | null;
 }
