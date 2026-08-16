@@ -30,7 +30,11 @@ export default function LimpiezaPage() {
   return (
     <PageFadeIn
       className="grid bg-neutral-950"
-      style={{ gridTemplateRows: "auto 1fr auto", minHeight: "100dvh" }}
+      style={{
+        gridTemplateRows: "auto 1fr auto",
+        minHeight:
+          "calc(100dvh - 64px - env(safe-area-inset-bottom) - env(safe-area-inset-top))",
+      }}
     >
       <ScreenHeader title="Limpieza" />
 
