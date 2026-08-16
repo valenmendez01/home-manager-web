@@ -28,12 +28,17 @@ export default function LimpiezaPage() {
   }
 
   return (
-    <PageFadeIn className="flex min-h-full flex-col bg-neutral-950">
+    <PageFadeIn
+      className="grid bg-neutral-950"
+      style={{ gridTemplateRows: "auto 1fr auto", minHeight: "100dvh" }}
+    >
       <ScreenHeader title="Limpieza" />
 
-      <div className="flex flex-1 items-center px-5">
+      <div className="flex items-center justify-center px-5">
         <PlanoAmbientes ambientes={ambientes} onSelect={setSeleccionado} />
       </div>
+
+      <div aria-hidden style={{ height: "calc(64px + env(safe-area-inset-bottom))" }} />
 
       <AmbienteDetailSheet ambiente={seleccionado} onClose={() => setSeleccionado(null)} />
     </PageFadeIn>
