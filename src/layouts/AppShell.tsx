@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, Tab } from "@heroui/tabs";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Home, Wallet, ShoppingCart } from "lucide-react";
 import { Key, ReactNode } from "react";
 
@@ -19,15 +20,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
     TABS.find((tab) => tab.key === location.pathname)?.key ?? "/limpieza";
 
   return (
-    <div className="h-full overflow-y-auto overscroll-contain safe-top">
+    <div className="relative h-full">
       {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
           nunca quede tapado; suma además el home-indicator de iOS */}
-      <main
-        className="h-full overflow-y-auto safe-top"
+      <ScrollShadow
+        className="h-full overscroll-contain safe-top"
         style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
       >
         {children}
-      </main>
+      </ScrollShadow>
 
       <div
         className="fixed inset-x-4 z-50 overflow-hidden rounded-full border border-neutral-800 bg-black/95 shadow-lg shadow-black/40 backdrop-blur-md"

@@ -31,7 +31,7 @@ export default function LimpiezaPage() {
     <PageFadeIn className="flex min-h-full flex-col bg-neutral-950">
       <ScreenHeader title="Limpieza" />
 
-      <div className="px-5">
+      <div className="flex flex-1 items-center px-5">
         <PlanoAmbientes ambientes={ambientes} onSelect={setSeleccionado} />
       </div>
 
