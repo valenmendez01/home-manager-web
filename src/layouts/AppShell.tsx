@@ -21,13 +21,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative h-full">
-      {/* paddingBottom reserva el espacio del navbar fijo para que el contenido
-          nunca quede tapado; suma además el home-indicator de iOS */}
-      <ScrollShadow
-        className="h-full overscroll-contain safe-top"
-        style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
-      >
+      <ScrollShadow hideScrollBar size={100} className="flex h-full flex-col overscroll-contain safe-top">
         {children}
+        <div aria-hidden style={{ height: "calc(64px + env(safe-area-inset-bottom))" }} />
       </ScrollShadow>
 
       <div
