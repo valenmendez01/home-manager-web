@@ -6,6 +6,7 @@ import { Compra } from "@/types/compras";
 import ScreenHeader from "@/components/ScreenHeader";
 import { Skeleton } from "@heroui/skeleton";
 import PageFadeIn from "@/components/PageFadeIn";
+import { AnimatePresence } from "framer-motion";
 
 export default function ComprasPage() {
   const { data: compras, isLoading } = useCompras();
@@ -32,9 +33,11 @@ export default function ComprasPage() {
         {compras.length === 0 && (
           <p className="mt-8 text-center text-sm text-neutral-500">No hay productos en la lista</p>
         )}
-        {compras.map((item: Compra) => (
-          <CompraItem key={item.id} compra={item} />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {compras.map((item: Compra) => (
+            <CompraItem key={item.id} compra={item} />
+          ))}
+        </AnimatePresence>
       </div>
     </PageFadeIn>
   );

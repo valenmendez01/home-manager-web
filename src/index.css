@@ -12,6 +12,7 @@
 @source "../node_modules/@heroui/theme/dist/components/card.js";
 @source "../node_modules/@heroui/theme/dist/components/date-picker.js";
 @source "../node_modules/@heroui/theme/dist/components/link.js";
+@source "../node_modules/@heroui/theme/dist/components/avatar.js";
 
 @theme {
   --color-app-bg: #0A0A0A;

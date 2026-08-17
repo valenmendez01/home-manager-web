@@ -64,7 +64,7 @@ export default function DeudasPage() {
 
       <div className="px-5 pb-6">
         {pendientes.length === 0 && (
-          <p className="mt-8 text-center text-sm text-neutral-500">No hay deudas pendientes</p>
+          <p className="my-8 text-center text-sm text-neutral-500">No hay deudas pendientes</p>
         )}
         {pendientes.map((item: Deuda) => (
           <DeudaCard key={item.id} deuda={item} />

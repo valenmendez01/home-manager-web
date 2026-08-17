@@ -10,6 +10,7 @@ import { addToast } from "@heroui/toast";
 import { Button } from "@heroui/button";
 import { Undo2 } from "lucide-react";
 import { formatMonto } from "@/utils/formatMonto";
+import { Avatar } from "@heroui/avatar";
 
 function nombreMes(offset: number) {
   const fecha = new Date();
@@ -40,14 +41,22 @@ function PagoRow({ pago }: { pago: PagoConDeuda }) {
 
   return (
     <div className="flex items-center justify-between border-b border-neutral-800 py-2">
+      <Avatar
+        name={nombreUsuario(pago.pagado_por)}
+        size="sm"
+        className="mr-3 shrink-0"
+        classNames={{ name: "text-xs" }}
+      />
       <div className="flex-1 pr-2">
         <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
         <p className="mt-0.5 text-xs text-neutral-500">
-          Pagó {nombreUsuario(pago.pagado_por)} · {new Date(pago.pagado_at).toLocaleDateString()}
+          {new Date(pago.pagado_at).toLocaleDateString()}
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <p className="text-sm font-medium text-neutral-300">{formatMonto(pago.deuda.monto_debe)}</p>
+        <p className="text-sm font-medium text-green-400">
+          +{formatMonto(pago.deuda.monto_debe)}
+        </p>
         {puedeDeshacer && (
           <Button
             isIconOnly
@@ -110,15 +119,26 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
           />
         )}
       </div>
-      {pagos.map((pago) => (
-        <div key={pago.id} className="flex items-center justify-between border-b border-neutral-800 py-2 px-1 last:border-b-0">
-          <div className="flex-1 pr-2">
-            <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
-            <p className="mt-0.5 text-xs text-neutral-500">Pagó {nombreUsuario(pago.pagado_por)}</p>
+      {pagos.map((pago) => {
+        const esIniciador = pago.pagado_por === iniciadoPor;
+        return (
+          <div key={pago.id} className="flex items-center justify-between border-b border-neutral-800 py-2 px-1 last:border-b-0">
+            <Avatar
+              name={nombreUsuario(pago.pagado_por)}
+              size="sm"
+              className="mr-3 shrink-0"
+              classNames={{ name: "text-xs" }}
+            />
+            <div className="flex-1 pr-2">
+              <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
+            </div>
+            <p className={`text-sm font-medium ${esIniciador ? "text-green-400" : "text-red-400"}`}>
+              {esIniciador ? "+" : "-"}
+              {formatMonto(pago.deuda.monto_debe)}
+            </p>
           </div>
-          <p className="text-sm font-medium text-neutral-300">{formatMonto(pago.deuda.monto_debe)}</p>
-        </div>
-      ))}
+        );
+      })}
       <div className="flex justify-end px-1 my-2">
         <p className="text-xs text-neutral-500">
           {iniciadoPor && acreedor
