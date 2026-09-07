@@ -1,10 +1,10 @@
 import { Deuda } from "@/types/deudas";
 import { nombreUsuario } from "@/constants/usuarios";
+import { Avatar } from "@heroui/avatar";
 import { useAuthStore } from "@/store/authStore";
 import { usePagarDeuda } from "@/hooks/usePagarDeuda";
-import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
-import { Trash2 } from "lucide-react";
+import { CheckCircle2, Trash2 } from "lucide-react";
 import { useEliminarDeuda } from "@/hooks/useEliminarDeuda";
 import { formatMonto } from "@/utils/formatMonto";
 
@@ -24,48 +24,64 @@ export default function DeudaCard({ deuda }: Props) {
 
   return (
     <div className="mb-3 rounded-2xl bg-neutral-900 p-4">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 pr-2">
-          <p className="text-base font-medium text-neutral-50">{deuda.descripcion}</p>
-          <p className="mt-1 text-xs text-neutral-500">
-            Pagó {nombreUsuario(deuda.pagado_por)} · {new Date(deuda.fecha).toLocaleDateString()}
+      <div className="flex items-start gap-3">
+        <Avatar name={nombreUsuario(deuda.pagado_por)} size="md" className="shrink-0" />
+
+        <div className="min-w-0 flex-1">
+          <p className="wrap-break-word text-base font-medium text-neutral-50">
+            {deuda.descripcion}
           </p>
-        </div>
-        <div className="flex flex-col items-end">
-          <p className="text-lg font-semibold text-neutral-50">{formatMonto(deuda.monto_total)}</p>
-          <p className="text-xs text-neutral-500">/ {formatMonto(deuda.monto_total / 2)}</p>
+          <p className="mt-0.5 text-xs text-neutral-500">
+            {esCreador ? "Pagaste vos" : `Pagó ${nombreUsuario(deuda.pagado_por)}`} ·{" "}
+            {new Date(deuda.fecha).toLocaleDateString()}
+          </p>
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
-        <Chip color="warning" variant="flat" size="sm">
-          Pendiente
-        </Chip>
+      <div className="mt-4 flex items-center justify-between">
+        <div>
+          <p className="text-sm text-neutral-50">
+            Total: <span className="font-semibold">{formatMonto(deuda.monto_total)}</span>
+          </p>
+          {esQuienDebe && (
+            <p className="text-md font-semibold text-rose-400">
+              Tu parte: -{formatMonto(deuda.monto_debe)}
+            </p>
+          )}
+          {esCreador && (
+            <p className="text-md font-semibold text-emerald-400">
+              Te debe: +{formatMonto(deuda.monto_debe)}
+            </p>
+          )}
+        </div>
 
-        {puedeMarcarPagada && (
-          <Button 
-            color="primary" 
-            size="sm" 
-            radius="lg" 
-            isLoading={pagarDeuda.isPending} 
-            onPress={() => pagarDeuda.mutate(deuda.id)}
-          >
-            Saldar
-          </Button>
-        )}
-        {esCreador && (
-          <Button
-            isIconOnly
-            variant="light"
-            size="sm"
-            className="ml-2"
-            isLoading={eliminarDeuda.isPending}
-            onPress={() => eliminarDeuda.mutate(deuda.id)}
-            aria-label="Eliminar deuda"
-          >
-            {!eliminarDeuda.isPending && <Trash2 size={18} color="#737373" />}
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {puedeMarcarPagada && (
+            <Button
+              color="primary"
+              variant="flat"
+              size="sm"
+              radius="lg"
+              startContent={!pagarDeuda.isPending && <CheckCircle2 size={16} />}
+              isLoading={pagarDeuda.isPending}
+              onPress={() => pagarDeuda.mutate(deuda.id)}
+            >
+              Saldar
+            </Button>
+          )}
+          {esCreador && (
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              isLoading={eliminarDeuda.isPending}
+              onPress={() => eliminarDeuda.mutate(deuda.id)}
+              aria-label="Eliminar deuda"
+            >
+              {!eliminarDeuda.isPending && <Trash2 size={18} color="#737373" />}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

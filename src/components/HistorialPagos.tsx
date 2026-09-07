@@ -7,15 +7,18 @@ import { useDeshacerPago } from "@/hooks/useDeshacerPago";
 import { useDeshacerSaldo } from "@/hooks/useDeshacerSaldo";
 import { useAuthStore } from "@/store/authStore";
 import { addToast } from "@heroui/toast";
+import { Tabs, Tab } from "@heroui/tabs";
 import { Button } from "@heroui/button";
 import { Undo2 } from "lucide-react";
 import { formatMonto } from "@/utils/formatMonto";
 import { Avatar } from "@heroui/avatar";
+import { motion } from "framer-motion";
 
 function nombreMes(offset: number) {
   const fecha = new Date();
   fecha.setMonth(fecha.getMonth() - offset);
-  return fecha.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+  const mes = fecha.toLocaleDateString("es-AR", { month: "long" });
+  return mes.charAt(0).toUpperCase() + mes.slice(1);
 }
 
 function esHoy(fechaIso: string) {
@@ -171,23 +174,45 @@ export default function HistorialPagos() {
     <div className="mt-6">
       <h2 className="mb-2 text-lg font-semibold text-neutral-50">Historial de pagos</h2>
 
-      {itemsActual.length > 0 && (
-        <div className="mb-4">
-          <p className="mb-1 text-xs font-medium uppercase text-neutral-500">{nombreMes(0)}</p>
-          {itemsActual.map((item) => (
-            <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
-          ))}
-        </div>
-      )}
-
-      {itemsPasado.length > 0 && (
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase text-neutral-500">{nombreMes(1)}</p>
-          {itemsPasado.map((item) => (
-            <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
-          ))}
-        </div>
-      )}
+      <Tabs
+        aria-label="Historial por mes"
+        defaultSelectedKey="actual"
+        variant="underlined"
+        classNames={{
+          tabList: "gap-4",
+        }}
+      >
+        <Tab key="actual" title={nombreMes(0)}>
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {itemsActual.length > 0 ? (
+              itemsActual.map((item) => (
+                <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
+              ))
+            ) : (
+              <p className="py-4 text-sm text-neutral-500">Sin movimientos este mes.</p>
+            )}
+          </motion.div>
+        </Tab>
+        <Tab key="pasado" title={nombreMes(1)}>
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {itemsPasado.length > 0 ? (
+              itemsPasado.map((item) => (
+                <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
+              ))
+            ) : (
+              <p className="py-4 text-sm text-neutral-500">Sin movimientos este mes.</p>
+            )}
+          </motion.div>
+        </Tab>
+      </Tabs>
     </div>
   );
 }

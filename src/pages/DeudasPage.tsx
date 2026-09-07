@@ -66,6 +66,9 @@ export default function DeudasPage() {
         {pendientes.length === 0 && (
           <p className="my-8 text-center text-sm text-neutral-500">No hay deudas pendientes</p>
         )}
+        {pendientes.length > 0 && (
+          <h2 className="mb-2 mt-2 text-lg font-semibold text-neutral-50">Pendientes</h2>
+        )}
         {pendientes.map((item: Deuda) => (
           <DeudaCard key={item.id} deuda={item} />
         ))}

@@ -6,6 +6,7 @@ import { formatMonto } from "@/utils/formatMonto";
 import { useSaldarDeudas } from "@/hooks/useSaldarDeudas";
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
+import { ArrowDownLeft, ArrowUpRight, CheckCheck } from "lucide-react";
 
 interface Props {
   deudas: Deuda[];
@@ -58,31 +59,38 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
 
   return (
     <div className="px-5 pb-4 pt-2">
-      <div className="flex gap-3">
-        <div className="flex-1 rounded-2xl bg-neutral-900 p-4">
-          <p className="text-xs text-neutral-500">Debés</p>
-          <p className="mt-1 text-xl font-semibold text-red-400">{formatMonto(miDeuda)}</p>
+      <div className="rounded-2xl bg-neutral-900 p-4">
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <p className="flex items-center gap-1 text-xs text-neutral-500">
+              <ArrowUpRight size={16} />
+              Debés
+            </p>
+            <p className="mt-1 text-xl font-semibold text-red-400">{formatMonto(miDeuda)}</p>
+          </div>
+          <div className="flex-1">
+            <p className="flex items-center gap-1 text-xs text-neutral-500">
+              <ArrowDownLeft size={16} />
+              {otroId ? nombreUsuario(otroId) : "El otro"} te debe
+            </p>
+            <p className="mt-1 text-xl font-semibold text-green-400">{formatMonto(suDeuda)}</p>
+          </div>
         </div>
-        <div className="flex-1 rounded-2xl bg-neutral-900 p-4">
-          <p className="text-xs text-neutral-500">
-            {otroId ? nombreUsuario(otroId) : "El otro"} te debe
-          </p>
-          <p className="mt-1 text-xl font-semibold text-green-400">{formatMonto(suDeuda)}</p>
-        </div>
-      </div>
 
-      <div className="mt-3">
-        <Button
-          color="primary"
-          variant="flat"
-          size="sm"
-          fullWidth
-          isDisabled={pendientes.length <= 1}
-          isLoading={saldarDeudas.isPending}
-          onPress={handleSaldar}
-        >
-          Saldar deuda total
-        </Button>
+        <div className="mt-2 pt-3">
+          
+          <Button
+            color="primary"
+            size="md"
+            fullWidth
+            isDisabled={pendientes.length <= 1}
+            isLoading={saldarDeudas.isPending}
+            onPress={handleSaldar}
+          >
+            <CheckCheck size={16} className="inline" />
+            Saldar deuda total
+          </Button>
+        </div>
       </div>
     </div>
   );
