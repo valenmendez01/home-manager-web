@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent } from "react";
-import { ChevronLeft } from "lucide-react";
+import { CircleChevronLeft } from "lucide-react";
 import { motion, PanInfo } from "framer-motion";
 import { Avatar } from "@heroui/avatar";
 import { Compra } from "@/types/compras";
@@ -80,7 +80,7 @@ export default function CompraItem({ compra }: Props) {
         )}
       </div>
 
-      <ChevronLeft size={18} className="ml-2 shrink-0 text-neutral-700" />
+      <CircleChevronLeft size={18} className="ml-2 shrink-0 text-neutral-700" />
     </motion.div>
   );
 }
