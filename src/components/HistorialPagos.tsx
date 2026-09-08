@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { usePagosHistorial } from "@/hooks/usePagosHistorial";
 import { agruparPagosPorMes } from "@/utils/agruparPorMes";
 import { agruparPorSaldo, ItemHistorial } from "@/utils/agruparPorSaldo";
@@ -9,9 +10,10 @@ import { useAuthStore } from "@/store/authStore";
 import { addToast } from "@heroui/toast";
 import { Tabs, Tab } from "@heroui/tabs";
 import { Button } from "@heroui/button";
+import { Accordion, AccordionItem } from "@heroui/accordion";
+import { Avatar } from "@heroui/avatar";
 import { Undo2 } from "lucide-react";
 import { formatMonto } from "@/utils/formatMonto";
-import { Avatar } from "@heroui/avatar";
 import { motion } from "framer-motion";
 
 function nombreMes(offset: number) {
@@ -25,10 +27,32 @@ function esHoy(fechaIso: string) {
   return new Date(fechaIso).toDateString() === new Date().toDateString();
 }
 
-function PagoRow({ pago }: { pago: PagoConDeuda }) {
-  const userId = useAuthStore((s) => s.user?.id);
-  const deshacerPago = useDeshacerPago();
+function idsIndividuales(items: ItemHistorial[]) {
+  return new Set(items.filter((i) => i.tipo === "individual").map((i) => i.pago.id));
+}
 
+function makeSelectionHandler(
+  setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>,
+  noExpandIds: Set<string>
+) {
+  return (keys: "all" | Set<React.Key>) => {
+    if (keys === "all") return; // no debería pasar con selectionMode="multiple" sin selectAll
+    const filtered = new Set(Array.from(keys).map(String).filter((k) => !noExpandIds.has(k)));
+    setExpanded(filtered);
+  };
+}
+
+// Props que necesitan los hooks (se resuelven UNA vez en HistorialPagos y se
+// pasan hacia abajo, para no tener componentes wrapper entre <Accordion> y
+// <AccordionItem>).
+interface AccionesHistorial {
+  userId: string | undefined;
+  deshacerPago: ReturnType<typeof useDeshacerPago>;
+  deshacerSaldo: ReturnType<typeof useDeshacerSaldo>;
+}
+
+function renderPagoItem(pago: PagoConDeuda, acciones: AccionesHistorial) {
+  const { userId, deshacerPago } = acciones;
   const puedeDeshacer = pago.pagado_por === userId && esHoy(pago.pagado_at);
 
   const handleDeshacer = () => {
@@ -43,43 +67,52 @@ function PagoRow({ pago }: { pago: PagoConDeuda }) {
   };
 
   return (
-    <div className="flex items-center justify-between border-b border-neutral-800 py-2">
-      <Avatar
-        name={nombreUsuario(pago.pagado_por)}
-        size="sm"
-        className="mr-3 shrink-0"
-        classNames={{ name: "text-xs" }}
-      />
-      <div className="flex-1 pr-2">
-        <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
-        <p className="mt-0.5 text-xs text-neutral-500">
-          {new Date(pago.pagado_at).toLocaleDateString()}
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <p className="text-sm font-medium text-green-400">
-          +{formatMonto(pago.deuda.monto_debe)}
-        </p>
-        {puedeDeshacer && (
-          <Button
-            isIconOnly
-            size="sm"
-            variant="light"
-            isLoading={deshacerPago.isPending}
-            onPress={handleDeshacer}
-            aria-label="Deshacer pago"
-          >
-            {!deshacerPago.isPending && <Undo2 size={16} color="#737373" />}
-          </Button>
-        )}
-      </div>
-    </div>
+    <AccordionItem
+      key={pago.id}
+      aria-label={pago.deuda.descripcion}
+      hideIndicator
+      title={
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex flex-1 items-center gap-3 pr-2">
+            <Avatar
+              name={nombreUsuario(pago.pagado_por)}
+              size="sm"
+              className="shrink-0"
+              classNames={{ name: "text-xs" }}
+            />
+            <div>
+              <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {new Date(pago.pagado_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-green-400">
+              +{formatMonto(pago.deuda.monto_debe)}
+            </p>
+            {puedeDeshacer && (
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                isLoading={deshacerPago.isPending}
+                onClick={(e) => e.stopPropagation()}
+                onPress={handleDeshacer}
+                aria-label="Deshacer pago"
+              >
+                {!deshacerPago.isPending && <Undo2 size={16} color="#737373" />}
+              </Button>
+            )}
+          </div>
+        </div>
+      }
+    />
   );
 }
 
-function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeuda[] }) {
-  const userId = useAuthStore((s) => s.user?.id);
-  const deshacerSaldo = useDeshacerSaldo();
+function renderSaldoItem(saldoId: string, pagos: PagoConDeuda[], acciones: AccionesHistorial) {
+  const { userId, deshacerSaldo } = acciones;
 
   const fecha = pagos[0].pagado_at;
   const iniciadoPor = pagos[0].saldo_iniciado_por;
@@ -106,60 +139,96 @@ function SaldoGroupRow({ saldoId, pagos }: { saldoId: string; pagos: PagoConDeud
   };
 
   return (
-    <div className="mb-1 mt-4 rounded-xl border border-neutral-800 bg-neutral-900/50 p-2">
-      <div className="flex items-center justify-between px-1 py-1">
-        <p className="text-xs font-medium uppercase text-neutral-500">
-          Saldo completo · {new Date(fecha).toLocaleDateString()}
-        </p>
-        {puedeDeshacer && (
-          <Button
-            size="sm"
-            variant="light"
-            isIconOnly
-            isLoading={deshacerSaldo.isPending}
-            onPress={handleDeshacer}
-            startContent={!deshacerSaldo.isPending && <Undo2 size={14} color="#737373" />}
-          />
-        )}
-      </div>
-      {pagos.map((pago) => {
-        const esIniciador = pago.pagado_por === iniciadoPor;
-        return (
-          <div key={pago.id} className="flex items-center justify-between border-b border-neutral-800 py-2 px-1 last:border-b-0">
-            <Avatar
-              name={nombreUsuario(pago.pagado_por)}
-              size="sm"
-              className="mr-3 shrink-0"
-              classNames={{ name: "text-xs" }}
-            />
-            <div className="flex-1 pr-2">
-              <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
+    <AccordionItem
+      key={saldoId}
+      aria-label="Liquidación total"
+      title={
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            {iniciadoPor && (
+              <Avatar
+                name={nombreUsuario(iniciadoPor)}
+                size="sm"
+                className="shrink-0"
+                classNames={{ name: "text-xs" }}
+              />
+            )}
+            <div>
+              <p className="text-sm text-neutral-50">
+                {iniciadoPor && acreedor ? (
+                  <>
+                    {iniciadoPor === userId ? "Le pagaste" : "Te pagó"}{" "}
+                    <span
+                      className={`font-semibold ${
+                        iniciadoPor === userId ? "text-red-400" : "text-green-400"
+                      }`}
+                    >
+                      {formatMonto(total)}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Total saldado: <span className="font-semibold">{formatMonto(total)}</span>
+                  </>
+                )}
+              </p>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {new Date(fecha).toLocaleDateString()}
+              </p>
             </div>
-            <p className={`text-sm font-medium ${esIniciador ? "text-green-400" : "text-red-400"}`}>
-              {esIniciador ? "+" : "-"}
-              {formatMonto(pago.deuda.monto_debe)}
-            </p>
           </div>
-        );
-      })}
-      <div className="flex justify-end px-1 my-2">
-        <p className="text-xs text-neutral-500">
-          {iniciadoPor && acreedor
-            ? `${nombreUsuario(iniciadoPor)} pagó ${formatMonto(total)} a ${nombreUsuario(acreedor)}`
-            : `Total saldado: ${formatMonto(total)}`}
-        </p>
+
+          {puedeDeshacer && (
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              isLoading={deshacerSaldo.isPending}
+              onClick={(e) => e.stopPropagation()}
+              onPress={handleDeshacer}
+              aria-label="Deshacer saldo"
+            >
+              {!deshacerSaldo.isPending && <Undo2 size={18} color="#737373" />}
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="-mt-2">
+        {pagos.map((pago) => {
+          const esIniciador = pago.pagado_por === iniciadoPor;
+          return (
+            <div
+              key={pago.id}
+              className="flex items-center justify-between  py-2 my-1 last:border-b-0"
+            >
+                
+              <p className="text-sm text-neutral-50">{pago.deuda.descripcion}</p>
+              <p className={`text-sm font-medium ${esIniciador ? "text-green-400" : "text-red-400"}`}>
+                {esIniciador ? "+" : "-"}
+                {formatMonto(pago.deuda.monto_debe)}
+              </p>
+            </div>
+          );
+        })}
       </div>
-    </div>
+    </AccordionItem>
   );
 }
 
-function ItemRow({ item }: { item: ItemHistorial }) {
-  if (item.tipo === "individual") return <PagoRow pago={item.pago} />;
-  return <SaldoGroupRow saldoId={item.saldoId} pagos={item.pagos} />;
+function renderItem(item: ItemHistorial, acciones: AccionesHistorial) {
+  if (item.tipo === "individual") return renderPagoItem(item.pago, acciones);
+  return renderSaldoItem(item.saldoId, item.pagos, acciones);
 }
 
 export default function HistorialPagos() {
   const { data: pagos, isLoading } = usePagosHistorial();
+  const userId = useAuthStore((s) => s.user?.id);
+  const deshacerPago = useDeshacerPago();
+  const deshacerSaldo = useDeshacerSaldo();
+
+  const [expandedActual, setExpandedActual] = useState<Set<string>>(new Set());
+  const [expandedPasado, setExpandedPasado] = useState<Set<string>>(new Set());
 
   if (isLoading || !pagos) return null;
 
@@ -169,6 +238,8 @@ export default function HistorialPagos() {
 
   const itemsActual = agruparPorSaldo(actual);
   const itemsPasado = agruparPorSaldo(pasado);
+
+  const acciones: AccionesHistorial = { userId, deshacerPago, deshacerSaldo };
 
   return (
     <div className="mt-6">
@@ -189,9 +260,52 @@ export default function HistorialPagos() {
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
             {itemsActual.length > 0 ? (
-              itemsActual.map((item) => (
-                <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
-              ))
+              <Accordion
+                variant="light"
+                selectionMode="single"
+                selectedKeys={expandedActual}
+                onSelectionChange={makeSelectionHandler(setExpandedActual, idsIndividuales(itemsActual))}
+                motionProps={{
+                  variants: {
+                    enter: {
+                      y: 0,
+                      opacity: 1,
+                      height: "auto",
+                      overflowY: "unset",
+                      transition: {
+                        height: {
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                          duration: 1,
+                        },
+                        opacity: {
+                          easings: "ease",
+                          duration: 1,
+                        },
+                      },
+                    },
+                    exit: {
+                      y: -10,
+                      opacity: 0,
+                      height: 0,
+                      overflowY: "hidden",
+                      transition: {
+                        height: {
+                          easings: "ease",
+                          duration: 0.25,
+                        },
+                        opacity: {
+                          easings: "ease",
+                          duration: 0.3,
+                        },
+                      },
+                    },
+                  },
+                }}
+              >
+                {itemsActual.map((item) => renderItem(item, acciones))}
+              </Accordion>
             ) : (
               <p className="py-4 text-sm text-neutral-500">Sin movimientos este mes.</p>
             )}
@@ -204,9 +318,52 @@ export default function HistorialPagos() {
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
             {itemsPasado.length > 0 ? (
-              itemsPasado.map((item) => (
-                <ItemRow key={item.tipo === "individual" ? item.pago.id : item.saldoId} item={item} />
-              ))
+              <Accordion
+                variant="light"
+                selectionMode="single"
+                selectedKeys={expandedPasado}
+                onSelectionChange={makeSelectionHandler(setExpandedPasado, idsIndividuales(itemsPasado))}
+                motionProps={{
+                  variants: {
+                    enter: {
+                      y: 0,
+                      opacity: 1,
+                      height: "auto",
+                      overflowY: "unset",
+                      transition: {
+                        height: {
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                          duration: 1,
+                        },
+                        opacity: {
+                          easings: "ease",
+                          duration: 1,
+                        },
+                      },
+                    },
+                    exit: {
+                      y: -10,
+                      opacity: 0,
+                      height: 0,
+                      overflowY: "hidden",
+                      transition: {
+                        height: {
+                          easings: "ease",
+                          duration: 0.25,
+                        },
+                        opacity: {
+                          easings: "ease",
+                          duration: 0.3,
+                        },
+                      },
+                    },
+                  },
+                }}
+              >
+                {itemsPasado.map((item) => renderItem(item, acciones))}
+              </Accordion>
             ) : (
               <p className="py-4 text-sm text-neutral-500">Sin movimientos este mes.</p>
             )}

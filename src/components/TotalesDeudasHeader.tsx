@@ -58,7 +58,7 @@ export default function TotalesDeudasHeader({ deudas }: Props) {
   };
 
   return (
-    <div className="px-5 pb-4 pt-2">
+    <div className="px-5 pt-2">
       <div className="rounded-2xl bg-neutral-900 p-4">
         <div className="flex gap-3">
           <div className="flex-1">

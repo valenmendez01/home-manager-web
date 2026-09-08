@@ -64,7 +64,7 @@ export default function DeudasPage() {
 
       <div className="px-5 pb-6">
         {pendientes.length === 0 && (
-          <p className="my-8 text-center text-sm text-neutral-500">No hay deudas pendientes</p>
+          <p className="my-8 text-center text-sm text-neutral-500 py-4">No hay deudas pendientes</p>
         )}
         {pendientes.length > 0 && (
           <h2 className="mb-2 mt-2 text-lg font-semibold text-neutral-50">Pendientes</h2>
