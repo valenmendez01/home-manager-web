@@ -251,6 +251,7 @@ export default function HistorialPagos() {
         variant="underlined"
         classNames={{
           tabList: "gap-4",
+          panel: "pt-1",
         }}
       >
         <Tab key="actual" title={nombreMes(0)}>
